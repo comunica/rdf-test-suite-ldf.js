@@ -14,3 +14,5 @@ yarn-error.log
 **/index.js
 **/index.js.map
 **/index.d.ts
+coverage
+tmp

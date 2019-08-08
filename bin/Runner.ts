@@ -4,6 +4,7 @@ import minimist = require("minimist");
 import {StreamWriter} from "n3";
 import * as Path from "path";
 import {ITestResult, ITestSuiteConfig, TestSuiteRunner} from "rdf-test-suite";
+import { LdfTestSuiteRunner } from "../lib/LdfTestSuiteRunner";
 
 // tslint:disable:no-console
 // tslint:disable:no-var-requires
@@ -63,10 +64,11 @@ const config: ITestSuiteConfig = {
   urlToFileMapping: args.m,
 };
 
+// TODO: Remove unnecessary code.
+
 // Fetch the manifest, run the tests, and print them
-/*
-const testSuiteRunner = new TestSuiteRunner();
-testSuiteRunner.runManifest(args._[1], engine, config)
+const ldfTestSuiteRunner = new LdfTestSuiteRunner();
+ldfTestSuiteRunner.runManifest(args._[1], engine, config)
   .then((testResults) => {
     switch (config.outputFormat) {
     case 'earl':
@@ -76,20 +78,20 @@ testSuiteRunner.runManifest(args._[1], engine, config)
       // Create properties file if it does not exist
       if (!existsSync(Path.join(process.cwd(), args.p))) {
         writeFileSync(Path.join(process.cwd(), args.p),
-          JSON.stringify(testSuiteRunner.packageJsonToEarlProperties(require(Path.join(process.cwd(), 'package.json'))),
+          JSON.stringify(ldfTestSuiteRunner.packageJsonToEarlProperties(require(Path.join(process.cwd(), 'package.json'))),
             null, '  '));
       }
-      (<any> testSuiteRunner.resultsToEarl(testResults, require(Path.join(process.cwd(), args.p)), new Date()))
+      (<any> ldfTestSuiteRunner.resultsToEarl(testResults, require(Path.join(process.cwd(), args.p)), new Date()))
         .pipe(new StreamWriter({ format: 'text/turtle', prefixes: require('../lib/prefixes.json') }))
         .pipe(process.stdout)
         .on('end', () => onEnd(testResults));
       break;
     case 'summary':
-      testSuiteRunner.resultsToText(process.stdout, testResults, true);
+      ldfTestSuiteRunner.resultsToText(process.stdout, testResults, true);
       onEnd(testResults);
       break;
     default:
-      testSuiteRunner.resultsToText(process.stdout, testResults, false);
+      ldfTestSuiteRunner.resultsToText(process.stdout, testResults, false);
       onEnd(testResults);
       break;
     }
@@ -105,4 +107,3 @@ function onEnd(testResults: ITestResult[]) {
     }
   }
 }
-*/
