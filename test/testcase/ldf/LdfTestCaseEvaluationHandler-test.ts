@@ -3,12 +3,13 @@ import "jest-rdf";
 import {
   LdfTestCaseEvaluation,
   LdfTestCaseEvaluationHandler,
+  ILdfTestaseEvaluationProps,
 } from "../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 const quad = require("rdf-quad");
 import { ContextParser } from "jsonld-context-parser";
 import * as RDF from "rdf-js";
 import { Resource } from "rdf-object";
-import { QueryResultQuads } from "rdf-test-suite";
+import { QueryResultQuads, ITestCaseData } from "rdf-test-suite";
 
 // tslint:disable:no-var-requires
 const streamifyString = require('streamify-string');
@@ -34,6 +35,11 @@ const streamifyString = require('streamify-string');
   }
   return Promise.resolve(new Response(body, <any> { headers, status: 200, url }));
 };
+
+// Urls representing the possible sourceTypes for a TestCaseLdfQueryEvaluationhandler
+const tpfUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF';
+const fileUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File';
+const notSupported: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl/NS';
 
 describe('TestCaseLdfQueryEvaluation', () => {
 
@@ -69,16 +75,13 @@ describe('TestCaseLdfQueryEvaluation', () => {
         pSourceType = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sourceType'), context });
         pTPF = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#RDF'), context });
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
         pData = new Resource(
           { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-query#data'), context });
 
         done();
       });
   });
-
-  // Urls representing the possible sourceTypes for a TestCaseLdfQueryEvaluationhandler
-  const tpfUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#RDF';
 
   describe('#resourceToTestCase', () => {
     it('should produce a TestCaseLdfQueryEvaluation without data', async () => {
@@ -156,6 +159,37 @@ describe('TestCaseLdfQueryEvaluation', () => {
         quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
       ]);
       expect(testcase.sourceType).toEqual(tpfUrl);
+    });
+
+  });
+
+});
+
+describe('LdfTestCaseEvaluation', () => {
+
+  describe('#constructor', () => {
+
+    it('should create a LdfTestCaseEvaluation', () => {
+      let testCaseData: ITestCaseData = {
+        uri: "",
+        types: ["", ""],
+        name: "",
+        comment: "",
+        approval: "",
+        approvedBy: "",
+      };
+      let props: ILdfTestaseEvaluationProps = {
+        baseIRI: "",
+        queryString: "",
+        querySource: "",
+        queryResult: null,
+        resultSource: null,
+        sourceType: notSupported,
+      }
+      let testcase = new LdfTestCaseEvaluation(testCaseData, props);
+      expect(testcase).toBeInstanceOf(LdfTestCaseEvaluation);
+      expect(testcase.sourceType).toEqual(notSupported);
+      expect(testcase.test(null, null)).rejects.toBeTruthy();
     });
 
   });

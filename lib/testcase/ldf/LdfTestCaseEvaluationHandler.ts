@@ -2,6 +2,9 @@ import { ITestCaseHandler, IQueryResult, TestCaseQueryEvaluationHandler, IFetchO
 import { Resource } from "rdf-object";
 import { ILdfTestCase } from "./ILdfTestCase";
 import { ILdfQueryEngine } from "./ILdfQueryEngine";
+import { FileQueryTester } from "./testers/FileQueryTester";
+import { TpfQueryTester } from "./testers/TpfQueryTester";
+import { LdfUtil } from "../../LdfUtil";
 // tslint:disable:no-var-requires
 const stringifyStream = require('stream-to-string');
 // tslint:enable:no-var-requires
@@ -89,20 +92,16 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
     if(this.resultSource){
-      const result : IQueryResult = await engine.query(this.querySource, this.queryString, {});
-      if (! await this.queryResult.equals(result)) {
-        throw new Error(`Invalid query evaluation
-  
-  Query:\n\n${this.queryString}
-
-  Data: ${this.querySource || 'none'}
-  
-  Result Source: ${this.resultSource.url}
-  
-  Expected: ${this.queryResult.toString()}
-  
-  Got: \n ${result.toString()}
-  `);
+      // TODO: Fix a cleaner way for this case and removePrefix
+      switch(LdfUtil.removePrefix(this.sourceType)) {
+        case "File":
+          new FileQueryTester().test(engine, injectArguments, this);
+          break;
+        case "TPF":
+          new TpfQueryTester().test(engine, injectArguments, this);
+          break;
+        default:
+          throw new Error(`The et:sourceType ${this.sourceType} cannot yet be tested.`);
       }
     }
   }
