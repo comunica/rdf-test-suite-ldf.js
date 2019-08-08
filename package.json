@@ -1,0 +1,84 @@
+{
+  "name": "rdf-test-suite-ldf.js",
+  "version": "1.0.0",
+  "description": "An engine testing suite",
+  "keywords": [
+    "sparql",
+    "ldf",
+    "linked data",
+    "query engines",
+    "test suite"
+  ],
+  "main": "index.js",
+  "typings": "index",
+  "repository": "https://github.com/ManuDeBuck/rdf-test-suite-ldf.js.git",
+  "author": "Manu De Buck <manu.debuck@telenet.be>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ManuDeBuck/rdf-test-suite-ldf.js/issues"
+  },
+  "homepage": "https://github.com/ManuDeBuck/rdf-test-suite-ldf.js#readme",
+  "contributors": [],
+  "bin": {
+    "rdf-test-suite-ldf": "bin/Runner.js"
+  },
+  "files": [
+    "bin/**/*.d.ts",
+    "bin/**/*.js",
+    "lib/**/*.d.ts",
+    "lib/**/*.js",
+    "lib/**/*.json",
+    "index.d.ts",
+    "index.js"
+  ],
+  "pre-commit": [
+    "build",
+    "lint",
+    "test"
+  ],
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "test/tsconfig.json"
+      }
+    },
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
+    ],
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.ts$",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "collectCoverage": true,
+    "testEnvironment": "node"
+  },
+  "scripts": {
+    "test": "jest ${1}",
+    "test-watch": "jest ${1} --watch",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "lint": "tslint index.ts lib/**/*.ts test/**/*.ts --exclude '**/*.d.ts'",
+    "build": "tsc",
+    "validate": "npm ls",
+    "prepare": "npm run build",
+    "version": "manual-git-changelog onversion"
+  },
+  "devDependencies": {
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.18.0",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@types/minimist": "^1.2.0",
+    "@types/n3": "^1.1.0",
+    "global": "^4.4.0",
+    "minimist": "^1.2.0",
+    "n3": "^1.1.1",
+    "rdf-test-suite": "^1.9.3"
+  }
+}
