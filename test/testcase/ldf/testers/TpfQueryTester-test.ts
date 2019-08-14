@@ -38,7 +38,7 @@ describe('TpfQueryTester', () => {
   const engine = {
     parse: (queryString: string) => queryString === 'OK'
       ? Promise.resolve(null) : Promise.reject(new Error('Invalid data ' + queryString)),
-    query: (sources: string[], queryString: string) => Promise.resolve(new QueryResultQuads([
+    query: (queryString: string, options: {[key: string]: any}) => Promise.resolve(new QueryResultQuads([
       quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
       quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
     ])),

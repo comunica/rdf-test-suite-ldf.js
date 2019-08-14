@@ -5,5 +5,5 @@ import { IQueryResult } from "rdf-test-suite";
  */
 export interface ILdfQueryEngine {
   parse(queryString: string, options: {[key: string]: any}) : Promise<void>;
-  query(dataSource: string[], queryString: string, options: {[key: string]: any}): Promise<IQueryResult>;
+  query(queryString: string, options: {[key: string]: any}): Promise<IQueryResult>;
 }

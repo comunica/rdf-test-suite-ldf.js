@@ -30,7 +30,7 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
     if(!action.property.query){
       throw new Error(`Missing qt:query in mf:action of ${resource}`);
     }
-    if(! action.property.sources){
+    if(!action.property.sources){
       throw new Error(`Missing et:sources in mf:action of ${resource}`);
     }
     // Check if Ldf source is stated
@@ -93,6 +93,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     Object.assign(this, props);
   }
 
+  /* istanbul ignore next */
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
     if(this.resultSource){
       // TODO: Fix a cleaner way for this case and removePrefix
