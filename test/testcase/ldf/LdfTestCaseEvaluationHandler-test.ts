@@ -1,4 +1,4 @@
-import { literal, namedNode } from "@rdfjs/data-model";
+import { literal, namedNode, blankNode } from "@rdfjs/data-model";
 import "jest-rdf";
 import {
   LdfTestCaseEvaluation,
@@ -59,7 +59,8 @@ describe('TestCaseLdfQueryEvaluation', () => {
   let pResult;
   let pSourceType;
   let pTPF;
-  let pData;
+  let pSources;
+  let pMockFolder;
 
   beforeEach((done) => {
     new ContextParser().parse(require('../../../lib/context-manifest.json'))
@@ -76,33 +77,42 @@ describe('TestCaseLdfQueryEvaluation', () => {
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sourceType'), context });
         pTPF = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
-        pData = new Resource(
-          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-query#data'), context });
-
+        pSources = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sources'), context });
+        pMockFolder =  new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#mockFolder'), context });
         done();
       });
   });
 
   describe('#resourceToTestCase', () => {
-    it('should produce a TestCaseLdfQueryEvaluation without data', async () => {
+    it('should produce a TestCaseLdfQueryEvaluation', async () => {
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
       action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+      action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+      const sources : Resource[] = [
+        new Resource({ term: namedNode('http://ex2.org'), context })
+      ];
+      const srcs = new Resource({ term: blankNode(), context });
+      srcs.list = sources;
+      action.addProperty(pSources, srcs);
       resource.addProperty(pAction, action);
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pSourceType, pTPF);
-      const testcase = await handler.resourceToTestCase(resource, <any> {});
 
-      expect(testcase).toBeInstanceOf(LdfTestCaseEvaluation);
-      expect(testcase.type).toEqual('ldf');
-      expect(testcase.queryString).toEqual('OK');
-      expect(testcase.queryResult.type).toEqual('quads');
-      expect(testcase.querySource).toEqual('');
-      expect(testcase.queryResult.value).toBeRdfIsomorphic([
+      const testCase = await handler.resourceToTestCase(resource, <any> {});
+      
+      expect(testCase).toBeInstanceOf(LdfTestCaseEvaluation);
+      expect(testCase.type).toEqual('ldf');
+      expect(testCase.queryString).toEqual('OK');
+      expect(testCase.queryResult.type).toEqual('quads');
+      expect(testCase.querySources).toEqual(['http://ex2.org']);
+      expect(testCase.queryResult.value).toBeRdfIsomorphic([
         quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
         quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
       ]);
-      expect(testcase.sourceType).toEqual(tpfUrl);
+      expect(testCase.sourceType).toEqual(tpfUrl);
     });
 
     it('should error on a resource without action', () => {
@@ -139,28 +149,6 @@ describe('TestCaseLdfQueryEvaluation', () => {
       return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
     });
 
-    it('should produce a TestCaseLdfQueryEvaluation with data in action', async () => {
-      const resource = new Resource({ term: namedNode('http://example.org/test'), context });
-      const action = new Resource({ term: namedNode('blabla'), context });
-      action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
-      action.addProperty(pData, new Resource({ term: namedNode('RESULT.ttl'), context }));
-      resource.addProperty(pAction, action);
-      resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
-      resource.addProperty(pSourceType, pTPF);
-      const testcase = await handler.resourceToTestCase(resource, <any> {});
-
-      expect(testcase).toBeInstanceOf(LdfTestCaseEvaluation);
-      expect(testcase.type).toEqual('ldf');
-      expect(testcase.queryString).toEqual('OK');
-      expect(testcase.querySource).toEqual('RESULT.ttl');
-      expect(testcase.queryResult.type).toEqual('quads');
-      expect(testcase.queryResult.value).toBeRdfIsomorphic([
-        quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
-        quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
-      ]);
-      expect(testcase.sourceType).toEqual(tpfUrl);
-    });
-
   });
 
 });
@@ -181,7 +169,7 @@ describe('LdfTestCaseEvaluation', () => {
       let props: ILdfTestaseEvaluationProps = {
         baseIRI: "",
         queryString: "",
-        querySource: "",
+        querySources: [],
         queryResult: null,
         resultSource: null,
         sourceType: notSupported,
@@ -189,7 +177,6 @@ describe('LdfTestCaseEvaluation', () => {
       let testcase = new LdfTestCaseEvaluation(testCaseData, props);
       expect(testcase).toBeInstanceOf(LdfTestCaseEvaluation);
       expect(testcase.sourceType).toEqual(notSupported);
-      expect(testcase.test(null, null)).rejects.toBeTruthy();
     });
 
   });

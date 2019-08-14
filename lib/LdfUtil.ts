@@ -1,4 +1,3 @@
-// TODO: Add tests
 /**
  * A class with utility functions.
  */

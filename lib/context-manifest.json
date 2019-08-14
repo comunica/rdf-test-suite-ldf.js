@@ -37,5 +37,7 @@
   "useRdfType": "jld:useRdfType",
 
   "et": "https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#",
-  "sourceType": "et:sourceType"
+  "sourceType": "et:sourceType",
+  "mockFolder": "et:mockFolder",
+  "sources": "et:sources"
 }

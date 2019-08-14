@@ -64,8 +64,6 @@ const config: ITestSuiteConfig = {
   urlToFileMapping: args.m,
 };
 
-// TODO: Remove unnecessary code.
-
 // Fetch the manifest, run the tests, and print them
 const ldfTestSuiteRunner = new LdfTestSuiteRunner();
 ldfTestSuiteRunner.runManifest(args._[1], engine, config)

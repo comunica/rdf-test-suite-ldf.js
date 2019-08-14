@@ -30,29 +30,30 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
     if(!action.property.query){
       throw new Error(`Missing qt:query in mf:action of ${resource}`);
     }
+    if(! action.property.sources){
+      throw new Error(`Missing et:sources in mf:action of ${resource}`);
+    }
     // Check if Ldf source is stated
     if(!resource.property.sourceType){
       throw new Error(`Missing et:sourceType in ${resource}`);
     }
+    // TODO: If sourceType is TPF: check if mockFolder is given!
     
-    let dataUri: string = null;
-    if(action.property.data){
-      dataUri = action.property.data.value;
-    }
-
-    // let queryData: RDF.Quad[] = dataUri ? await arrayifyStream((await Util.fetchRdf(dataUri, options))[1]) : [];
     const queryResponse = await Util.fetchCached(resource.property.result.value, options);
     return new LdfTestCaseEvaluation(
       testCaseData,
       {
         baseIRI: Util.normalizeBaseUrl(action.property.query.value),
         queryString: await stringifyStream((await Util.fetchCached(action.property.query.value, options)).body),
-        querySource: dataUri || '',
+        querySources: await Promise.all<string>([].concat.apply([],
+          action.properties.sources.map((entrySources: Resource) => entrySources.list.map(
+          (entry: Resource) => entry.term.value)))),
         queryResult: await TestCaseQueryEvaluationHandler.parseQueryResult(
           Util.identifyContentType(queryResponse.url, queryResponse.headers),
           queryResponse.url, queryResponse.body),
         resultSource: queryResponse,
-        sourceType: resource.property.sourceType.value
+        sourceType: resource.property.sourceType.value,
+        mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined
       }
     );
   }
@@ -62,11 +63,12 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
 export interface ILdfTestaseEvaluationProps {
   baseIRI: string;
   queryString: string;
-  querySource: string; // url to location of data source
+  querySources: string[]; // urls to locations of data sources
   queryResult: IQueryResult;
   resultSource: IFetchResponse;
   // Necessary for testing different sourceTypes
   sourceType: string;
+  mockFolder?: string;
 }
 
 export class LdfTestCaseEvaluation implements ILdfTestCase {
@@ -80,10 +82,11 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 
   public readonly baseIRI: string;
   public readonly queryString: string;
-  public readonly querySource: string;
+  public readonly querySources: string[];
   public readonly queryResult: IQueryResult;
   public readonly resultSource: IFetchResponse;
   public readonly sourceType: string;
+  public readonly mockFolder?: string;
 
   constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps){
     Object.assign(this, testCaseData);
@@ -95,13 +98,11 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
       // TODO: Fix a cleaner way for this case and removePrefix
       switch(LdfUtil.removePrefix(this.sourceType)) {
         case "File":
-          new FileQueryTester().test(engine, injectArguments, this);
-          break;
+          return new FileQueryTester().test(engine, injectArguments, this);
         case "TPF":
-          new TpfQueryTester().test(engine, injectArguments, this);
-          break;
+          return new TpfQueryTester().test(engine, injectArguments, this);
         default:
-          throw new Error(`The et:sourceType ${this.sourceType} cannot yet be tested.`);
+          throw new Error(`The et:sourceType ${this.sourceType} is nog yet supported.`);
       }
     }
   }
