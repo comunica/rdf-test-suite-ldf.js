@@ -12,7 +12,7 @@ export class LdfUtil {
    * @param resourceIRI A string representing the IRI of the resource
    */
   public static removePrefix(resourceIRI: string) : string {
-    if(resourceIRI.indexOf('#')){
+    if(resourceIRI.indexOf('#') > 0){
       return resourceIRI.substring(resourceIRI.indexOf('#') + 1,resourceIRI.length);
     }
     // else: not implemented.

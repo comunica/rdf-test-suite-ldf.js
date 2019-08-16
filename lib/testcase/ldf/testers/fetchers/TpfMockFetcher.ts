@@ -62,7 +62,6 @@ export class TpfMockFetcher {
    * @param headers The header lines of the mocked testfile.
    * @returns a map with the header values.
    */
-  /* istanbul ignore next */ // ignore because jest is wrong. :-(
   private static parseMockedFileHeaders(headers: string) : any {
     let result: any = {};
     for(let line of headers.split('\n')){

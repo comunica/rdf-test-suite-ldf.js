@@ -39,19 +39,11 @@ const streamifyString = require('streamify-string');
 // Urls representing the possible sourceTypes for a TestCaseLdfQueryEvaluationhandler
 const tpfUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF';
 const fileUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File';
-const notSupported: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl/NS';
+const notSupported: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#NS';
 
 describe('TestCaseLdfQueryEvaluation', () => {
 
   const handler = new LdfTestCaseEvaluationHandler();
-  const engine = {
-    parse: (queryString: string) => queryString === 'OK'
-      ? Promise.resolve(null) : Promise.reject(new Error('Invalid data ' + queryString)),
-    query: (data: RDF.Quad[], queryString: string) => Promise.resolve(new QueryResultQuads([
-      quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
-      quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
-    ])),
-  };
 
   let context;
   let pAction;
@@ -143,6 +135,22 @@ describe('TestCaseLdfQueryEvaluation', () => {
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
       action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+      const sources : Resource[] = [
+        new Resource({ term: namedNode('http://ex2.org'), context })
+      ];
+      const srcs = new Resource({ term: blankNode(), context });
+      srcs.list = sources;
+      action.addProperty(pSources, srcs);
+      resource.addProperty(pAction, action);
+      resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
+
+      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+    });
+
+    it('should error on a resource without sources', () => {
+      const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+      const action = new Resource({ term: namedNode('blabla'), context });
+      action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
       resource.addProperty(pAction, action);
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
 
@@ -154,6 +162,16 @@ describe('TestCaseLdfQueryEvaluation', () => {
 });
 
 describe('LdfTestCaseEvaluation', () => {
+
+  const handler = new LdfTestCaseEvaluationHandler();
+  const engine = {
+    parse: (queryString: string) => queryString === 'OK'
+      ? Promise.resolve(null) : Promise.reject(new Error('Invalid data ' + queryString)),
+    query: (queryString: string, options: {}) => Promise.resolve(new QueryResultQuads([
+      quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
+      quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
+    ])),
+  };
 
   describe('#constructor', () => {
 
@@ -171,12 +189,54 @@ describe('LdfTestCaseEvaluation', () => {
         queryString: "",
         querySources: [],
         queryResult: null,
-        resultSource: null,
+        resultSource: {body: undefined, headers: undefined, url: undefined},
         sourceType: notSupported,
       }
       let testcase = new LdfTestCaseEvaluation(testCaseData, props);
       expect(testcase).toBeInstanceOf(LdfTestCaseEvaluation);
       expect(testcase.sourceType).toEqual(notSupported);
+    });
+
+    it('should reject when no resultSource is given', () => {
+      let testCaseData: ITestCaseData = {
+        uri: "",
+        types: ["", ""],
+        name: "",
+        comment: "",
+        approval: "",
+        approvedBy: "",
+      };
+      let props: ILdfTestaseEvaluationProps = {
+        baseIRI: "",
+        queryString: "",
+        querySources: [],
+        queryResult: null,
+        resultSource: null,
+        sourceType: notSupported,
+      }
+      let testcase = new LdfTestCaseEvaluation(testCaseData, props);
+      return expect(testcase.test(engine, {})).rejects.toBeTruthy();
+    });
+
+    it('should reject when sourceType is not supported', () => {
+      let testCaseData: ITestCaseData = {
+        uri: "",
+        types: ["", ""],
+        name: "",
+        comment: "",
+        approval: "",
+        approvedBy: "",
+      };
+      let props: ILdfTestaseEvaluationProps = {
+        baseIRI: "",
+        queryString: "",
+        querySources: [],
+        queryResult: null,
+        resultSource: {body: undefined, headers: undefined, url: undefined},
+        sourceType: notSupported,
+      }
+      let testcase = new LdfTestCaseEvaluation(testCaseData, props);
+      return expect(testcase.test(engine, {})).rejects.toBeTruthy();
     });
 
   });

@@ -49,7 +49,7 @@ describe('FileQueryTester', () => {
   let pQuery;
   let pResult;
   let pSourceType;
-  let pTPF;
+  let pFile;
   let pSources;
   let pMockFolder;
 
@@ -66,8 +66,8 @@ describe('FileQueryTester', () => {
           { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
         pSourceType = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sourceType'), context });
-        pTPF = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
+        pFile = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File'), context });
         pSources = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sources'), context });
         pMockFolder =  new Resource(
@@ -77,7 +77,6 @@ describe('FileQueryTester', () => {
   });
 
   describe('test', () => {
-
 
     it('should produce TestCaseQueryEvaluation that tests true on equal results', async () => {
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
@@ -92,7 +91,7 @@ describe('FileQueryTester', () => {
       action.addProperty(pSources, srcs);
       resource.addProperty(pAction, action);
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
-      resource.addProperty(pSourceType, pTPF);
+      resource.addProperty(pSourceType, pFile);
 
       const testCase = await handler.resourceToTestCase(resource, <any> {});
 
@@ -112,7 +111,7 @@ describe('FileQueryTester', () => {
       action.addProperty(pSources, srcs);
       resource.addProperty(pAction, action);
       resource.addProperty(pResult, new Resource({ term: literal('RESULT_other.ttl'), context }));
-      resource.addProperty(pSourceType, pTPF);
+      resource.addProperty(pSourceType, pFile);
 
       const testCase = await handler.resourceToTestCase(resource, <any> {});
 

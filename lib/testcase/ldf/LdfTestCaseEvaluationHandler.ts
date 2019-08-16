@@ -93,7 +93,6 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     Object.assign(this, props);
   }
 
-  /* istanbul ignore next */
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
     if(this.resultSource){
       // TODO: Fix a cleaner way for this case and removePrefix
@@ -103,8 +102,9 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
         case "TPF":
           return new TpfQueryTester().test(engine, injectArguments, this);
         default:
-          throw new Error(`The et:sourceType ${this.sourceType} is nog yet supported.`);
+          throw new Error(`The et:sourceType ${this.sourceType} is not yet supported.`);
       }
     }
+    throw new Error(`There is no result source given: ${this.sourceType}`);
   }
 }

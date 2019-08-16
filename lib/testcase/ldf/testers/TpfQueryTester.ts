@@ -60,6 +60,7 @@ export class TpfQueryTester implements ILdfQueryTester {
    * to the tested engine.
    * @param object The LdfTestCaseEvaluation we will be evaluating
    */
+  /* istanbul ignore next */
   private async setUpServer(object: LdfTestCaseEvaluation) : Promise<void> {
     return new Promise(async (resolve, reject) => {
       this.dummyServer = await http.createServer((request: any, response: any) => {
@@ -77,6 +78,7 @@ export class TpfQueryTester implements ILdfQueryTester {
   /**
    * Tear the server down after quering, avoid spilling resources and leaving ports blocked.
    */
+  /* istanbul ignore next */
   private tearDownServer() {
     if(this.dummyServer === undefined || ! this.dummyServer.listening ) return;
     this.dummyServer.close((err) => {
