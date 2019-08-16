@@ -1,5 +1,5 @@
 # rdf-test-suite-ldf.js
-[![Build Status](https://travis-ci.org/ManuDeBuck/rdf-test-suite-ldf.js.svg?branch=master)](https://travis-ci.org/ManuDeBuck/rdf-test-suite-ldf.js)
+[![Build Status](https://travis-ci.org/ManuDeBuck/rdf-test-suite-ldf.js.svg?branch=master)](https://travis-ci.org/ManuDeBuck/rdf-test-suite-ldf.js) [![Coverage Status](https://coveralls.io/repos/github/ManuDeBuck/rdf-test-suite-ldf.js/badge.svg?branch=master)](https://coveralls.io/github/ManuDeBuck/rdf-test-suite-ldf.js?branch=master) [![npm version](https://badge.fury.io/js/rdf-test-suite-ldf.svg)](https://badge.fury.io/js/rdf-test-suite-ldf)
 
 This is a nodejs CLI-tool which executes integration-tests on query-engines such as the [comunica-engines](https://github.com/ManuDeBuck/comunica-engines) and is based on the [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) written by [Ruben Taelman](https://github.com/rubensworks).
 
@@ -10,13 +10,13 @@ It uses test-manifests (you can find examples on the _engine-ontology_ repositor
 Either install it globally:
 
 ```bash
-$ yarn global add rdf-test-suite-ldf.js
+$ yarn global add rdf-test-suite-ldf
 ```
 
 or locally (as a dev dependency):
 
 ```bash
-$ yarn add --dev rdf-test-suite-ldf.js
+$ yarn add --dev rdf-test-suite-ldf
 ```
 
 ## Usage
