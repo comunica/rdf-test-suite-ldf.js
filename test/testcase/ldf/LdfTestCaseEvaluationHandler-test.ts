@@ -5,14 +5,11 @@ import {
   LdfTestCaseEvaluationHandler,
   ILdfTestaseEvaluationProps,
 } from "../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
-const quad = require("rdf-quad");
+import * as quad from 'rdf-quad';
 import { ContextParser } from "jsonld-context-parser";
-import * as RDF from "rdf-js";
 import { Resource } from "rdf-object";
 import { QueryResultQuads, ITestCaseData } from "rdf-test-suite";
-
-// tslint:disable:no-var-requires
-const streamifyString = require('streamify-string');
+import * as streamifyString from 'streamify-string';
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {

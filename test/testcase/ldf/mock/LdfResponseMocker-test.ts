@@ -4,9 +4,9 @@ import { ContextParser } from "jsonld-context-parser";
 import { QueryResultQuads, IQueryResult, TestCaseQueryEvaluationHandler, Util } from "rdf-test-suite";
 import { LdfTestCaseEvaluationHandler, LdfTestCaseEvaluation } from "../../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import { LdfResponseMocker } from "../../../../lib/testcase/ldf/mock/LdfResponseMocker";
-const quad = require("rdf-quad");
-const streamifyString = require('streamify-string');
-const ProxyHandlerStatic = require("@comunica/actor-http-proxy").ProxyHandlerStatic;
+import * as quad from 'rdf-quad';
+import *  as streamifyString from 'streamify-string';
+import * as phs from '@comunica/actor-http-proxy';
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {
@@ -96,7 +96,7 @@ describe('LdfResponseMocker', () => {
 
       const result: IQueryResult = await engine.query(this.queryString, { 
         sources: this.querySources,
-        httpProxyHandler: new ProxyHandlerStatic(mocker.proxyAddress),
+        httpProxyHandler: new phs.ProxyHandlerStatic(mocker.proxyAddress),
       });
   
       mocker.tearDownServer();

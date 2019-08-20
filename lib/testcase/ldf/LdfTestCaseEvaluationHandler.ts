@@ -3,10 +3,8 @@ import { Resource } from "rdf-object";
 import { ILdfTestCase } from "./ILdfTestCase";
 import { ILdfQueryEngine } from "./ILdfQueryEngine";
 import { LdfResponseMocker } from "./mock/LdfResponseMocker";
-// tslint:disable:no-var-requires
-const stringifyStream = require('stream-to-string');
-const ProxyHandlerStatic = require("@comunica/actor-http-proxy").ProxyHandlerStatic;
-// tslint:enable:no-var-requires
+import * as stringifyStream from 'stream-to-string';
+import * as cph from '@comunica/actor-http-proxy';
 
 
 /**
@@ -95,7 +93,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 
       const result: IQueryResult = await engine.query(this.queryString, { 
         sources: this.querySources,
-        httpProxyHandler: new ProxyHandlerStatic(this.responseMocker.proxyAddress),
+        httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
       });
 
       // Tear down the mock-server for all sources

@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 import {existsSync, mkdirSync, writeFileSync} from "fs";
-import minimist = require("minimist");
+import * as minimist from 'minimist';
 import {StreamWriter} from "n3";
 import * as Path from "path";
 import {ITestResult, ITestSuiteConfig, TestSuiteRunner} from "rdf-test-suite";
 import { LdfTestSuiteRunner } from "../lib/LdfTestSuiteRunner";
 
 // tslint:disable:no-console
-// tslint:disable:no-var-requires
-
 const args = minimist(process.argv.slice(2));
 
 if (args._.length < 2) {

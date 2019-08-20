@@ -1,9 +1,7 @@
 import { LdfTestCaseEvaluation, ILdfTestaseEvaluationProps } from "../../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import { ITestCaseData } from "rdf-test-suite";
 import { LdfMockFetcher, IMockedResponse } from "../../../../lib/testcase/ldf/fetchers/LdfMockFetcher";
-const nock = require('nock');
-
-const streamifyString = require('streamify-string');
+import * as nock from 'nock';
 
 describe('LdfMockFetcher', () => {
 

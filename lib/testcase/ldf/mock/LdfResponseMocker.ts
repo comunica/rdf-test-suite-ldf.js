@@ -1,8 +1,7 @@
 import { Server } from "http";
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
 import { IMockedResponse, LdfMockFetcher } from "../fetchers/LdfMockFetcher";
-
-const http = require('http');
+import * as http from 'http';
 
 
 export class LdfResponseMocker {

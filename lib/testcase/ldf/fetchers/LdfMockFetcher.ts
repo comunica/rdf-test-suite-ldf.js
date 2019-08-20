@@ -1,7 +1,7 @@
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
 import { ClientRequest, IncomingMessage } from "http";
 import * as https from 'https';
-const crypto = require('crypto');
+import * as crypto from 'crypto';
 
 /**
  * Class that fetches the mocked testfiles.
