@@ -5,6 +5,7 @@ import { ILdfQueryEngine } from "./ILdfQueryEngine";
 import { LdfResponseMocker } from "./mock/LdfResponseMocker";
 import * as stringifyStream from 'stream-to-string';
 import * as cph from '@comunica/actor-http-proxy';
+import { IDataSource } from "./IDataSource";
 
 
 /**
@@ -23,27 +24,30 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
     if(!resource.property.result) {
       throw new Error(`Missing mf:result in ${resource}`);
     }
+    if(!resource.property.dataSources || resource.property.dataSources.list.length <= 0){
+      throw new Error(`Missing et:dataSources in ${resource}`);
+    }
     const action = resource.property.action;
     if(!action.property.query){
       throw new Error(`Missing qt:query in mf:action of ${resource}`);
     }
-    if(!action.property.sources){
-      throw new Error(`Missing et:sources in mf:action of ${resource}`);
-    }
+    
+
     const queryResponse = await Util.fetchCached(resource.property.result.value, options);
     return new LdfTestCaseEvaluation(
       testCaseData,
       {
         baseIRI: Util.normalizeBaseUrl(action.property.query.value),
         queryString: await stringifyStream((await Util.fetchCached(action.property.query.value, options)).body),
-        querySources: await Promise.all<string>([].concat.apply([],
-          action.properties.sources.map((entrySources: Resource) => entrySources.list.map(
-          (entry: Resource) => entry.term.value)))),
+        dataSources: await Promise.all<IDataSource>([].concat.apply([],
+          resource.properties.dataSources.map((entrySources: Resource) => entrySources.list.map(
+          (entry: Resource) => {
+            return {'value': entry.property.source.value, 'type': entry.property.sourceType.value };
+          })))),
         queryResult: await TestCaseQueryEvaluationHandler.parseQueryResult(
           Util.identifyContentType(queryResponse.url, queryResponse.headers),
           queryResponse.url, queryResponse.body),
         resultSource: queryResponse,
-        sourceType: resource.property.sourceType ? resource.property.sourceType.value : undefined,
         mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined
       }
     );
@@ -54,10 +58,9 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
 export interface ILdfTestaseEvaluationProps {
   baseIRI: string;
   queryString: string;
-  querySources: string[]; // urls to locations of data sources
+  dataSources: IDataSource[]; // urls to locations of data sources
   queryResult: IQueryResult;
   resultSource: IFetchResponse;
-  sourceType?: string; // TODO: This is deprecated, will be removing soon
   mockFolder?: string;
 }
 
@@ -70,12 +73,11 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   public readonly name: string;
   public readonly uri: string;
 
-  public readonly baseIRI: string;
-  public readonly queryString: string;
-  public readonly querySources: string[];
+  public readonly baseIRI: string; // IRI of query source
+  public readonly queryString: string; 
+  public readonly dataSources: IDataSource[];
   public readonly queryResult: IQueryResult;
   public readonly resultSource: IFetchResponse;
-  public readonly sourceType: string;
   public readonly mockFolder?: string;
 
   private readonly responseMocker: LdfResponseMocker;
@@ -83,28 +85,27 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
-    this.responseMocker = new LdfResponseMocker(3000);
+    this.responseMocker = new LdfResponseMocker(3000, this.dataSources);
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
-    if(this.resultSource !== undefined){
-      // Set up mock-server for all sources that need to be mocked
-      await this.responseMocker.setUpServer(this);
+    // Set up mock-server for all sources that need to be mocked
+    await this.responseMocker.setUpServer(this);
 
-      const result: IQueryResult = await engine.query(this.queryString, { 
-        sources: this.querySources,
-        httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
-      });
+    const result: IQueryResult = await engine.query(this.queryString, { 
+      sources: this.dataSources.map((v: IDataSource) => { return v.value; }),
+      httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
+    });
 
-      // Tear down the mock-server for all sources
-      this.responseMocker.tearDownServer();
-      
-      if (! await this.queryResult.equals(result)) {
-        throw new Error(`Invalid query evaluation    
-  
+    // Tear down the mock-server for all sources
+    this.responseMocker.tearDownServer();
+    
+    if (! await this.queryResult.equals(result)) {
+      throw new Error(`Invalid query evaluation    
+
   Query: ${this.queryString}
 
-  Data: ${this.querySources || 'none'}     
+  Data: ${this.dataSources || 'none'}     
   
   Result Source: ${this.resultSource.url}    
   
@@ -112,9 +113,6 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   
   Got: \n ${result.toString()}
 `);
-      }
-    } else {
-      throw new Error(`There is no result source given: ${this.resultSource}`);
     }
   }
 }

@@ -2,11 +2,7 @@
  * A class with utility functions.
  */
 export class LdfUtil {
-
-  constructor(){
-
-  }
-
+  
   /**
    * Removes the prefix of a resource. Presuming the prefix ends wih '#'
    * @param resourceIRI A string representing the IRI of the resource

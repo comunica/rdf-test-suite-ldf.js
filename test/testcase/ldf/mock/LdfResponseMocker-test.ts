@@ -45,7 +45,9 @@ describe('LdfResponseMocker', () => {
   let pResult;
   let pSourceType;
   let pTPF;
-  let pSources;
+  let pFile;
+  let pDataSources;
+  let pSource;
   let pMockFolder;
 
   beforeEach((done) => {
@@ -63,32 +65,42 @@ describe('LdfResponseMocker', () => {
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sourceType'), context });
         pTPF = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
-        pSources = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sources'), context });
+        pFile = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File'), context })
+        pDataSources = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#dataSources'), context });
+        pSource = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#source'), context });
         pMockFolder =  new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#mockFolder'), context });
         done();
       });
   });
 
-  let mocker: LdfResponseMocker = new LdfResponseMocker(4444);
-
   describe('#setUpServer', () => {
 
-    it('sould set up a reachable and working server', async () => {
+    it('should set up a reachable and working server', async () => {
+      let mocker: LdfResponseMocker = new LdfResponseMocker(4444, [
+        {type: 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF', value: 'http://ex2.org'}
+      ]);
+
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
       action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
       action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+
+      const src1 : Resource = new Resource({ term: blankNode(), context });
+      src1.addProperty(pSource, new Resource({ term: literal('https://ex2.org'), context }));
+      src1.addProperty(pSourceType, pTPF);
       const sources : Resource[] = [
-        new Resource({ term: namedNode('http://ex2.org'), context })
+        src1
       ];
-      const srcs = new Resource({ term: blankNode(), context });
-      srcs.list = sources;
-      action.addProperty(pSources, srcs);
+      const dataSources = new Resource({ term: blankNode(), context });
+      dataSources.list = sources;
+
       resource.addProperty(pAction, action);
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
-      resource.addProperty(pSourceType, pTPF);
+      resource.addProperty(pDataSources, dataSources);
 
       const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
 
@@ -110,6 +122,38 @@ describe('LdfResponseMocker', () => {
       expect(await queryResult.equals(result)).toBeTruthy();
     });
 
+    it('should forward request over https', async () => {
+      let mocker: LdfResponseMocker = new LdfResponseMocker(4444, [
+        {type: 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File', value: 'https://ex2.org'}
+      ]);
+
+      const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+      const action = new Resource({ term: namedNode('blabla'), context });
+      action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+      action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+
+      const src1 : Resource = new Resource({ term: blankNode(), context });
+      src1.addProperty(pSource, new Resource({ term: literal('https://ex2.org'), context }));
+      src1.addProperty(pSourceType, pFile);
+      const sources : Resource[] = [
+        src1
+      ];
+      const dataSources = new Resource({ term: blankNode(), context });
+      dataSources.list = sources;
+
+      resource.addProperty(pAction, action);
+      resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
+      resource.addProperty(pDataSources, dataSources);
+
+      const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+      
+      expect(mocker.isWhiteListed('https://ex2.org')).toBeTruthy();
+      expect(mocker.isWhiteListed('https://ex3.org')).toBeFalsy();
+      expect(mocker.getHttpSClient('http:')).toEqual(require('http'));
+      expect(mocker.getHttpSClient('https:')).toEqual(require('https')); 
+      mocker.tearDownServer();
+      mocker.tearDownServer();
+    });
   });
 
 });

@@ -1,4 +1,4 @@
-import { manifestFromResource, IFetchOptions, IManifest, ITestCaseHandler, ITestCase, IManifestLoaderArgs, ManifestLoader } from "rdf-test-suite";
+import { manifestFromResource, IFetchOptions, IManifest, ITestCaseHandler, ITestCase, IManifestLoaderArgs, ManifestLoader, Util } from "rdf-test-suite";
 import { RdfObjectLoader, Resource } from "rdf-object";
 
 export class LdfManifestLoader extends ManifestLoader {

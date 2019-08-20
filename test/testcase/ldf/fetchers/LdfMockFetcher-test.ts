@@ -18,10 +18,9 @@ describe('LdfMockFetcher', () => {
   let props: ILdfTestaseEvaluationProps = {
     baseIRI: "",
     queryString: "",
-    querySources: [],
+    dataSources: [],
     queryResult: null,
     resultSource: null,
-    sourceType: null,
     mockFolder: 'https://md.bu/mockfolder'
   }
   let object = new LdfTestCaseEvaluation(testCaseData, props);
@@ -43,7 +42,7 @@ describe('LdfMockFetcher', () => {
       });
     });
 
-    it('should resolve', () => {
+    it('should resolve with .ttl', () => {
       nock('https://md.bu').get('/mockfolder/f24cc7f355c770c76d1bd6b39770f35a2ef48fbf.ttl')
         .reply(200,`# Query: null
 # Hashed IRI: http://ex.org/
@@ -51,6 +50,16 @@ describe('LdfMockFetcher', () => {
 @prefix void: <http://rdfs.org/ns/void#>.`);
 
       return expect(LdfMockFetcher.parseMockedResponse(requestedURI, object, "undefined")).resolves.toBeTruthy();
+    });
+
+    it('should resolve with .srj', () => {
+      nock('https://md.bu').get('/mockfolder/f24cc7f355c770c76d1bd6b39770f35a2ef48fbf.srj')
+        .reply(200,`# Query: null
+# Hashed IRI: http://ex.org/
+# Content-type: application/sparql-results+json
+@prefix void: <http://rdfs.org/ns/void#>.`);
+
+      return expect(LdfMockFetcher.parseMockedResponse(requestedURI, object, 'application/sparql-results+json')).resolves.toBeTruthy();
     });
 
     it('should not resolve', () => {

@@ -6,7 +6,6 @@ import * as Path from "path";
 import {ITestResult, ITestSuiteConfig, TestSuiteRunner} from "rdf-test-suite";
 import { LdfTestSuiteRunner } from "../lib/LdfTestSuiteRunner";
 
-// tslint:disable:no-console
 const args = minimist(process.argv.slice(2));
 
 if (args._.length < 2) {
@@ -48,7 +47,8 @@ const engine = require(process.cwd() + '/' + args._[0]);
 const defaultConfig = {
   exitWithStatusCode0: false,
   outputFormat: 'detailed',
-  timeOutDuration: 3000,
+  timeOutDuration: 5000, 
+  // A higher timeOutDuration than the original rdf-test-suite because of more overhead w/ mock servers
 };
 
 const config: ITestSuiteConfig = {

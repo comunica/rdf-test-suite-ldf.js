@@ -39,5 +39,6 @@
   "et": "https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#",
   "sourceType": "et:sourceType",
   "mockFolder": "et:mockFolder",
-  "sources": "et:sources"
+  "dataSources": "et:dataSources",
+  "source": "et:source"
 }
