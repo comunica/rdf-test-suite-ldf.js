@@ -3,6 +3,10 @@ node_js:
   - "8"
   - "10"
   - "node"
+addons:
+  apt:
+    config:
+      retries: true
 script:
   - npm run build
   - npm run lint
