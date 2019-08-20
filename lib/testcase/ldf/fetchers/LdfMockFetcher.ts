@@ -1,4 +1,4 @@
-import { LdfTestCaseEvaluation } from "../../LdfTestCaseEvaluationHandler";
+import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
 import { ClientRequest, IncomingMessage } from "http";
 import * as https from 'https';
 const crypto = require('crypto');
@@ -6,7 +6,7 @@ const crypto = require('crypto');
 /**
  * Class that fetches the mocked testfiles.
  */
-export class TpfMockFetcher {
+export class LdfMockFetcher {
 
   /**
    * Parse the mocked testfiles.
@@ -14,11 +14,10 @@ export class TpfMockFetcher {
    * @param object The LdfTestCaseEvaluation we're testing 
    * @returns IMockedResponse representing the mocked testfiles
    */
-  public static parseMockedResponse(requestedURI: string, object: LdfTestCaseEvaluation): Promise<IMockedResponse> {
+  public static parseMockedResponse(requestedURI: string, object: LdfTestCaseEvaluation, acceptHeader: string): Promise<IMockedResponse> {
     return new Promise((resolve, reject) => {
       let body = '';
-
-      const req: ClientRequest = https.request(this.getMockedFileURI(object.mockFolder, requestedURI));
+      const req: ClientRequest = https.request(this.getMockedFileURI(object.mockFolder, requestedURI, acceptHeader));
       req.on('response', (incoming: IncomingMessage) => {
         incoming.setEncoding('utf8');
         incoming.on('data', (chunk: any) => {
@@ -52,9 +51,22 @@ export class TpfMockFetcher {
    * @param mockFolderURI The URI of the folder containing the mocked testfiles
    * @param requestedURI The URI of the request the engine requests
    */
-  private static getMockedFileURI(mockFolderURI: string, requestedURI: string) : string {
+  private static getMockedFileURI(mockFolderURI: string, requestedURI: string, acceptHeader: string) : string {
     // TODO: Check if mockFolderURI doesn't yet have a trailing slash!
-    return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex') + '.ttl';
+    return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex') + this.getExtensionOnAcceptHeader(acceptHeader);
+  }
+
+  /**
+   * Depending on the Accept-header of the HTTP request we should find the files under another extension.
+   * @param acceptHeader The request Accept-header value
+   */
+  private static getExtensionOnAcceptHeader(acceptHeader: string) : string {
+    switch(acceptHeader){
+      case 'application/sparql-results+json':
+        return '.srj';
+      default: // TODO: Implement this further, change TPF-recorder to .trig
+        return '.ttl';
+    }
   }
 
   /**

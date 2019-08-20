@@ -2,11 +2,10 @@ import { ITestCaseHandler, IQueryResult, TestCaseQueryEvaluationHandler, IFetchO
 import { Resource } from "rdf-object";
 import { ILdfTestCase } from "./ILdfTestCase";
 import { ILdfQueryEngine } from "./ILdfQueryEngine";
-import { FileQueryTester } from "./testers/FileQueryTester";
-import { TpfQueryTester } from "./testers/TpfQueryTester";
-import { LdfUtil } from "../../LdfUtil";
+import { LdfResponseMocker } from "./mock/LdfResponseMocker";
 // tslint:disable:no-var-requires
 const stringifyStream = require('stream-to-string');
+const ProxyHandlerStatic = require("@comunica/actor-http-proxy").ProxyHandlerStatic;
 // tslint:enable:no-var-requires
 
 
@@ -33,12 +32,6 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
     if(!action.property.sources){
       throw new Error(`Missing et:sources in mf:action of ${resource}`);
     }
-    // Check if Ldf source is stated
-    if(!resource.property.sourceType){
-      throw new Error(`Missing et:sourceType in ${resource}`);
-    }
-    // TODO: If sourceType is TPF: check if mockFolder is given!
-    
     const queryResponse = await Util.fetchCached(resource.property.result.value, options);
     return new LdfTestCaseEvaluation(
       testCaseData,
@@ -52,7 +45,7 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
           Util.identifyContentType(queryResponse.url, queryResponse.headers),
           queryResponse.url, queryResponse.body),
         resultSource: queryResponse,
-        sourceType: resource.property.sourceType.value,
+        sourceType: resource.property.sourceType ? resource.property.sourceType.value : undefined,
         mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined
       }
     );
@@ -66,8 +59,7 @@ export interface ILdfTestaseEvaluationProps {
   querySources: string[]; // urls to locations of data sources
   queryResult: IQueryResult;
   resultSource: IFetchResponse;
-  // Necessary for testing different sourceTypes
-  sourceType: string;
+  sourceType?: string; // TODO: This is deprecated, will be removing soon
   mockFolder?: string;
 }
 
@@ -88,23 +80,43 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   public readonly sourceType: string;
   public readonly mockFolder?: string;
 
+  private readonly responseMocker: LdfResponseMocker;
+
   constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
+    this.responseMocker = new LdfResponseMocker(3000);
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
-    if(this.resultSource){
-      // TODO: Fix a cleaner way for this case and removePrefix
-      switch(LdfUtil.removePrefix(this.sourceType)) {
-        case "File":
-          return new FileQueryTester().test(engine, injectArguments, this);
-        case "TPF":
-          return new TpfQueryTester().test(engine, injectArguments, this);
-        default:
-          throw new Error(`The et:sourceType ${this.sourceType} is not yet supported.`);
+    if(this.resultSource !== undefined){
+      // Set up mock-server for all sources that need to be mocked
+      await this.responseMocker.setUpServer(this);
+
+      const result: IQueryResult = await engine.query(this.queryString, { 
+        sources: this.querySources,
+        httpProxyHandler: new ProxyHandlerStatic(this.responseMocker.proxyAddress),
+      });
+
+      // Tear down the mock-server for all sources
+      this.responseMocker.tearDownServer();
+      
+      if (! await this.queryResult.equals(result)) {
+        throw new Error(`Invalid query evaluation    
+  
+  Query: ${this.queryString}
+
+  Data: ${this.querySources || 'none'}     
+  
+  Result Source: ${this.resultSource.url}    
+  
+  Expected: ${this.queryResult.toString()}     
+  
+  Got: \n ${result.toString()}
+`);
       }
+    } else {
+      throw new Error(`There is no result source given: ${this.resultSource}`);
     }
-    throw new Error(`There is no result source given: ${this.sourceType}`);
   }
 }

@@ -29,6 +29,10 @@ const streamifyString = require('streamify-string');
     body = streamifyString(`@prefix : <http://ex.org#> . :s1 :o1 "t1", "t2".`);
     headers = new Headers({ 'Content-Type': 'text/turtle' });
     break;
+  case 'RESULT_other.ttl':
+    body = streamifyString(`@prefix : <http://ex.org#> . :s1 :o1 "t1".`);
+    headers = new Headers({ 'Content-Type': 'text/turtle' });
+    break;
   default:
     return Promise.reject(new Error('Fetch error'));
     break;
@@ -131,7 +135,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
     });
 
-    it('should error on a resource without sourceType', () => {
+    it('should not error on a resource without sourceType', () => {
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
       action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
@@ -144,7 +148,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       resource.addProperty(pAction, action);
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
 
-      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+      return expect(handler.resourceToTestCase(resource, <any> {})).resolves.toBeTruthy();
     });
 
     it('should error on a resource without sources', () => {
@@ -172,6 +176,41 @@ describe('LdfTestCaseEvaluation', () => {
       quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
     ])),
   };
+
+  let context;
+  let pAction;
+  let pQuery;
+  let pResult;
+  let pSourceType;
+  let pTPF;
+  let pFile;
+  let pSources;
+  let pMockFolder;
+
+  beforeEach((done) => {
+    new ContextParser().parse(require('../../../lib/context-manifest.json'))
+      .then((parsedContext) => {
+        context = parsedContext;
+
+        pAction = new Resource(
+          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action'), context });
+        pQuery = new Resource(
+          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-query#query'), context });
+        pResult = new Resource(
+          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
+        pSourceType = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sourceType'), context });
+        pTPF = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
+        pFile = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File'), context });
+        pSources = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sources'), context });
+        pMockFolder =  new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#mockFolder'), context });
+        done();
+      });
+  });
 
   describe('#constructor', () => {
 
@@ -212,33 +251,98 @@ describe('LdfTestCaseEvaluation', () => {
         querySources: [],
         queryResult: null,
         resultSource: null,
-        sourceType: notSupported,
+        sourceType: undefined,
       }
       let testcase = new LdfTestCaseEvaluation(testCaseData, props);
       return expect(testcase.test(engine, {})).rejects.toBeTruthy();
     });
 
-    it('should reject when sourceType is not supported', () => {
-      let testCaseData: ITestCaseData = {
-        uri: "",
-        types: ["", ""],
-        name: "",
-        comment: "",
-        approval: "",
-        approvedBy: "",
-      };
-      let props: ILdfTestaseEvaluationProps = {
-        baseIRI: "",
-        queryString: "",
-        querySources: [],
-        queryResult: null,
-        resultSource: {body: undefined, headers: undefined, url: undefined},
-        sourceType: notSupported,
-      }
-      let testcase = new LdfTestCaseEvaluation(testCaseData, props);
-      return expect(testcase.test(engine, {})).rejects.toBeTruthy();
+    describe('TPF', () => {
+
+      it('should produce TestCaseQueryEvaluation that tests true on equal results', async () => {
+        const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+        const action = new Resource({ term: namedNode('blabla'), context });
+        action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+        action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+        const sources : Resource[] = [
+          new Resource({ term: namedNode('http://ex2.org'), context })
+        ];
+        const srcs = new Resource({ term: blankNode(), context });
+        srcs.list = sources;
+        action.addProperty(pSources, srcs);
+        resource.addProperty(pAction, action);
+        resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
+        resource.addProperty(pSourceType, pTPF);
+  
+        const testCase = await handler.resourceToTestCase(resource, <any> {});
+  
+        return expect(testCase.test(engine, {})).resolves.toBe(undefined);
+      });
+      
+      it('should produce TestCaseQueryEvaluation that tests false on non-equal results', async () => {
+        const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+        const action = new Resource({ term: namedNode('blabla'), context });
+        action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+        action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+        const sources : Resource[] = [
+          new Resource({ term: namedNode('http://ex2.org'), context })
+        ];
+        const srcs = new Resource({ term: blankNode(), context });
+        srcs.list = sources;
+        action.addProperty(pSources, srcs);
+        resource.addProperty(pAction, action);
+        resource.addProperty(pResult, new Resource({ term: literal('RESULT_other.ttl'), context }));
+        resource.addProperty(pSourceType, pTPF);
+  
+        const testCase = await handler.resourceToTestCase(resource, <any> {});
+  
+        return expect(testCase.test(engine, {})).rejects.toBeTruthy();
+      });
+
     });
 
+    describe('FILE', () => {
+
+      it('should produce TestCaseQueryEvaluation that tests true on equal results', async () => {
+        const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+        const action = new Resource({ term: namedNode('blabla'), context });
+        action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+        const sources : Resource[] = [
+          new Resource({ term: namedNode('http://ex2.org'), context })
+        ];
+        const srcs = new Resource({ term: blankNode(), context });
+        srcs.list = sources;
+        action.addProperty(pSources, srcs);
+        resource.addProperty(pAction, action);
+        resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
+        resource.addProperty(pSourceType, pFile);
+  
+        const testCase = await handler.resourceToTestCase(resource, <any> {});
+  
+        return expect(testCase.test(engine, {})).resolves.toBe(undefined);
+      });
+      
+      it('should produce TestCaseQueryEvaluation that tests false on non-equal results', async () => {
+        const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+        const action = new Resource({ term: namedNode('blabla'), context });
+        action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+        const sources : Resource[] = [
+          new Resource({ term: namedNode('http://ex2.org'), context })
+        ];
+        const srcs = new Resource({ term: blankNode(), context });
+        srcs.list = sources;
+        action.addProperty(pSources, srcs);
+        resource.addProperty(pAction, action);
+        resource.addProperty(pResult, new Resource({ term: literal('RESULT_other.ttl'), context }));
+        resource.addProperty(pSourceType, pFile);
+  
+        const testCase = await handler.resourceToTestCase(resource, <any> {});
+  
+        return expect(testCase.test(engine, {})).rejects.toBeTruthy();
+      });
+
+    });
+  
   });
 
 });
