@@ -33,7 +33,7 @@ export class LdfResponseMocker {
   /* istanbul ignore next */ // TODO: Have a look at a way to test this...
   public async setUpServer(object: LdfTestCaseEvaluation) : Promise<void> {
     return new Promise(async (resolve, reject) => {
-      this.dummyServer = await http.createServer().listen(3000);
+      this.dummyServer = await http.createServer().listen(this.port);
       this.dummyServer.on('request', async (request: any, response: any) => {
         let args : any = require('url').parse(request.url, true);
         let query : string = args.path.substring(1);

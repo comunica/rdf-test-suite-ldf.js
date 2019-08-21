@@ -81,22 +81,22 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   public readonly mockFolder?: string;
 
   private readonly responseMocker: LdfResponseMocker;
+  private readonly portNr: number;
 
   constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
-    this.responseMocker = new LdfResponseMocker(this.dataSources);
+    this.portNr = Math.floor(Math.random() * 65534) + 1024; // TODO: Maybe a cleaner way to do this?
+    this.responseMocker = new LdfResponseMocker(this.dataSources, this.portNr);
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
     // Set up mock-server for all sources that need to be mocked
     await this.responseMocker.setUpServer(this);
-
     const result: IQueryResult = await engine.query(this.queryString, { 
-      sources: this.dataSources.map((v: IDataSource) => { return v.value; }),
+      sources: this.mapSources(this.dataSources),
       httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
     });
-
     // Tear down the mock-server for all sources
     this.responseMocker.tearDownServer();
     
@@ -115,4 +115,35 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 `);
     }
   }
+
+  /**
+   * Map the manifest-sourceTypes to the sourcetypes the engine uses (based on comunica-engines).
+   * @param sources The sources from the manifest file
+   */
+  // TODO: Clean this up, this can be done with a map
+  private mapSources(sources: IDataSource[]) : any[] {
+    let rtrn: any[] = [];
+    for(let source of sources){
+      switch(source.type.split('#')[1]){
+        case 'TPF':
+          source.type = '';
+          break;
+        case 'File':
+          source.type = 'file';
+          break;
+        case 'SPARQL':
+          source.type = 'sparql';
+          break;
+        case 'HDT':
+          source.type = 'hdtFile';
+          break;
+        case 'RDFJS':
+          source.type = 'rdfjsSource';
+          break;
+      }
+      rtrn.push(source);
+    }
+    return rtrn;
+  }
+
 }

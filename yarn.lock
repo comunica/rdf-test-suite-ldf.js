@@ -194,14 +194,15 @@
     "@comunica/actor-init-sparql" "^1.9.1"
     "@comunica/actor-rdf-dereference-file" "^1.9.0"
 
-"@comunica/actor-init-sparql-hdt@^1.5.0":
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@comunica/actor-init-sparql-hdt/-/actor-init-sparql-hdt-1.5.0.tgz#04a0e11acb4f5aa3259435c6787e328ebc2ce449"
-  integrity sha512-WbxFwTu4KgQaNh1IwOZS4zeliXks/EPkUJ120kpOrvhxVh/NMB13B9hKxdzV+AeBJE3l/LccmolOLAq9vPy+Yw==
+"@comunica/actor-init-sparql-hdt@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@comunica/actor-init-sparql-hdt/-/actor-init-sparql-hdt-1.5.1.tgz#5b206e6bf1905fe26f90ed38e58f04cd100b0ab7"
+  integrity sha512-JZAqxP9cT2ZwtmpPpa7+UkntizEwu3kMkw9AI89bG5zP47COdc9GdzxII/Je0QptKr1sV59AqM58AaarBVBrDw==
   dependencies:
     "@comunica/actor-init-sparql" "^1.9.0"
     "@comunica/actor-rdf-resolve-quad-pattern-hdt" "^1.5.0"
     "@comunica/runner-cli" "^1.9.0"
+    "@types/minimist" "^1.2.0"
 
 "@comunica/actor-init-sparql@^1.9.0", "@comunica/actor-init-sparql@^1.9.1":
   version "1.9.1"
