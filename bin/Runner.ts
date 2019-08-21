@@ -26,7 +26,7 @@ Options:
   -e    always exit with status code 0 on test errors
   -t    regex for test IRIs to run
   -i    JSON string with custom options that need to be passed to the engine
-  -d    time out duration for test cases (in milliseconds, default 3000)
+  -d    time out duration for test cases (in milliseconds, default 5000)
   -m    URL to local path mapping (e.g. 'https://w3c.github.io/json-ld-api/|/path/to/folder/')
 `);
   process.exit(1);
