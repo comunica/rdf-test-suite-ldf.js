@@ -80,9 +80,9 @@ describe('LdfResponseMocker', () => {
   describe('#setUpServer', () => {
 
     it('should set up a reachable and working server', async () => {
-      let mocker: LdfResponseMocker = new LdfResponseMocker(4444, [
+      let mocker: LdfResponseMocker = new LdfResponseMocker([
         {type: 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF', value: 'http://ex2.org'}
-      ]);
+      ], 4444);
 
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
@@ -123,9 +123,9 @@ describe('LdfResponseMocker', () => {
     });
 
     it('should forward request over https', async () => {
-      let mocker: LdfResponseMocker = new LdfResponseMocker(4444, [
+      let mocker: LdfResponseMocker = new LdfResponseMocker([
         {type: 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File', value: 'https://ex2.org'}
-      ]);
+      ], 4444);
 
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });

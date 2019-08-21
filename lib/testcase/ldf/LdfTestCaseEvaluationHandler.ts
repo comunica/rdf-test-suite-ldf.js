@@ -85,7 +85,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
-    this.responseMocker = new LdfResponseMocker(3000, this.dataSources);
+    this.responseMocker = new LdfResponseMocker(this.dataSources);
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {

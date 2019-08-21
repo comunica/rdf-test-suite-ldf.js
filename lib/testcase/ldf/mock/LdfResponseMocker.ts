@@ -10,15 +10,17 @@ import { ifStatement } from "@babel/types";
 export class LdfResponseMocker {
 
   private dummyServer: Server;
+  private port: number;
   public readonly proxyAddress: string;
   private dataSources: IDataSource[];
   private whiteList: string[];
 
 
-  constructor(port: number, dataSources: IDataSource[]){
+  constructor(dataSources: IDataSource[], port?: number){
     // server will be initialized when testing
     this.dummyServer = undefined;
-    this.proxyAddress = `http://127.0.0.1:${port}/` // default proxy address
+    this.port = port ? port : 3000; // Defaul port is 3000
+    this.proxyAddress = `http://127.0.0.1:${this.port}/` // Proxy address 
     this.dataSources = dataSources;
     this.fillWhiteList();
   }
@@ -36,7 +38,6 @@ export class LdfResponseMocker {
         let args : any = require('url').parse(request.url, true);
         let query : string = args.path.substring(1);
         let accept : string = request.headers.accept;
-
         if(this.isWhiteListed(query.split('/').slice(0, 3).join('/'))){
           // This response should not be mocked
           let options = {
