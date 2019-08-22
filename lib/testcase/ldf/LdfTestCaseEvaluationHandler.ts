@@ -57,7 +57,7 @@ export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTest
 
 }
 
-export interface ILdfTestaseEvaluationProps {
+export interface ILdfTestCaseEvaluationProps {
   baseIRI: string;
   queryString: string;
   dataSources: IDataSource[]; // urls to locations of data sources
@@ -88,7 +88,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   private readonly tmpHdtFolder: string;
   private createdFolder: boolean;
 
-  constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps, factory: LdfResponseMockerFactory){
+  constructor(testCaseData: ITestCaseData, props: ILdfTestCaseEvaluationProps, factory: LdfResponseMockerFactory){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
     this.factory = factory;
@@ -149,7 +149,6 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
           case 'SPARQL':
             is.type = 'sparql';
             break;
-          // TODO: For both: if caching is enabled then there should be checked if the files are already downloaded
           case 'HDT':
             fse.ensureDirSync(this.tmpHdtFolder);
             let hdtFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
