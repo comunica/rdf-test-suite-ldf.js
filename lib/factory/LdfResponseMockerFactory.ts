@@ -14,7 +14,7 @@ export class LdfResponseMockerFactory {
    */
   public getNewLdfResponseMocker(): Promise<LdfResponseMocker> {
     return new Promise(async (resolve, reject) => {
-      while (! await this.isPortAvailable(this.currentPort)) {
+      while (this.isPort(this.currentPort) && ! await this.isPortAvailable(this.currentPort)) {
         this.currentPort += 1;
       }
       const mocker: LdfResponseMocker = new LdfResponseMocker(this.currentPort);
@@ -34,6 +34,17 @@ export class LdfResponseMockerFactory {
         .once('listening', () => tester.once('close', () => resolve(true)).close())
         .listen(port);
     });
+  }
+
+  /**
+   * Check if the port is a valid port number
+   * @param port The port-number that should be tested
+   */
+  private isPort(port: number): boolean {
+    if (! (1024 <= port && port <= 49151)) {
+      throw new Error('There are not enough ports for these tests. Please choose a lower starting port.');
+    }
+    return true;
   }
 
 }
