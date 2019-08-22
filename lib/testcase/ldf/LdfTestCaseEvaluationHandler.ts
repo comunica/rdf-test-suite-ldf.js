@@ -6,20 +6,18 @@ import { LdfResponseMocker } from "./mock/LdfResponseMocker";
 import * as stringifyStream from 'stream-to-string';
 import * as cph from '@comunica/actor-http-proxy';
 import * as fse from 'fs-extra';
-import { IDataSource } from "./IDataSource";
+import { IDataSource, ISource } from "./IDataSource";
 import { LdfUtil } from "../../LdfUtil";
 import { ILdfTestCaseHandler } from "./ILdfTestCaseHandler";
 import { LdfResponseMockerFactory } from "../../factory/LdfResponseMockerFactory";
-
+import { storeStream } from "rdf-store-stream";
+import { request, ClientRequest } from "http";
+const rdfParser = require('rdf-parse').default;
 
 /**
  * Test case handler for https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#LdfQueryEvaluationTest.
  */
 export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTestCaseEvaluation> {
-
-  constructor(){
-
-  }
 
   public async resourceToLdfTestCase(resource: Resource, factory: LdfResponseMockerFactory, testCaseData: ITestCaseData, options?: IFetchOptions): Promise<LdfTestCaseEvaluation> {
     if(!resource.property.action) {
@@ -113,7 +111,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     // Tear down the mock-server for all sources
     this.responseMocker.tearDownServer();
     if(this.createdFolder){
-      fse.remove(this.tmpHdtFolder);
+      fse.emptyDirSync(this.tmpHdtFolder);
     }
 
     if (! await this.queryResult.equals(result)) {
@@ -125,7 +123,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   
   Result Source: ${this.resultSource.url}    
   
-  Expected: ${this.queryResult.toString()}     
+  Expected: ${this.queryResult}     
   
   Got: \n ${result.toString()}
 `);
@@ -136,30 +134,43 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
    * Map the manifest-sourceTypes to the sourcetypes the engine uses (based on comunica-engines).
    * @param sources The sources from the manifest file
    */
-  private mapSources(sources: IDataSource[]) : Promise<any[]> {
+  private mapSources(sources: IDataSource[]) : Promise<ISource[]> {
     return new Promise(async (resolve, reject) => {
-      let rtrn: any[] = [];
+      let rtrn: ISource[] = [];
       for(let source of sources){
+        let is : ISource = source;
         switch(source.type.split('#')[1]){
           case 'TPF':
-            source.type = '';
+            is.type = '';
             break;
           case 'File':
-            source.type = 'file';
+            is.type = 'file';
             break;
           case 'SPARQL':
-            source.type = 'sparql';
+            is.type = 'sparql';
             break;
+          // TODO: For both: if caching is enabled then there should be checked if the files are already downloaded
           case 'HDT':
             fse.ensureDirSync(this.tmpHdtFolder);
-            let filename: string = await LdfUtil.fetchHdtFile(this.tmpHdtFolder, source.value);
+            let hdtFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
+
             this.createdFolder = true;
-            source.type = 'hdtFile';
-            source.value = this.tmpHdtFolder + '/' + filename;
+
+            is.type = 'hdtFile';
+            is.value = this.tmpHdtFolder + '/' + hdtFile;
             break;
-          /*case 'RDFJS':
-            source.type = 'rdfjsSource';
-            break;*/
+          case 'RDFJS':
+            fse.ensureDirSync(this.tmpHdtFolder);
+
+            let rdfjsFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
+            let stream : NodeJS.ReadableStream = fse.createReadStream(this.tmpHdtFolder + '/' + rdfjsFile);        
+            const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
+
+            this.createdFolder = true;
+
+            is.value = await storeStream(quadStream);
+            is.type = 'rdfjsSource';
+            break;
           default:
             throw new Error(`The sourcetype: ${source.type} is not known.`);
         }

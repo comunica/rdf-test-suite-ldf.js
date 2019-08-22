@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { IDataSource } from './testcase/ldf/IDataSource';
 
 /**
  * A class with utility functions.
@@ -31,17 +32,19 @@ export class LdfUtil {
   }
 
   /**
-   * Temporarily fetch the hdt file for the query engine
-   * @param hdtIRI The IRI of the .hdt-file that should be fetched
+   * Temporarily fetch a file for the query engine
+   * @param folder: The folder where the temporary file should be saved
+   * @param source: The IDataSource representing the source that should be fetched
    */
   /* istanbul ignore next */
-  public static fetchHdtFile(folder: string, hdtIRI: string): Promise<string> {
+  public static fetchFile(folder: string, source: IDataSource): Promise<string> {
     return new Promise(async (resolve, reject) => {
+      let iri: string = source.value;
       // we want to re-use the current filename for the temp file
-      let filename: string = hdtIRI.split('/').slice(-1)[0];
+      let filename: string = iri.split('/').slice(-1)[0];
       const file = fs.createWriteStream(folder +'/'+ filename);
       
-      this.getHttpSClient(hdtIRI.split('/')[0]).get(hdtIRI, (response: any) => {
+      this.getHttpSClient(iri.split('/')[0]).get(iri, (response: any) => {
         response.on('data', (data: any) => {
           file.write(data);
         });

@@ -32,7 +32,7 @@
     "index.js"
   ],
   "pre-commit": [
-    "build",
+    "tsc",
     "lint",
     "test"
   ],
@@ -69,6 +69,7 @@
   "devDependencies": {
     "@comunica/actor-init-sparql-file": "^1.9.1",
     "@comunica/actor-init-sparql-hdt": "^1.5.1",
+    "@comunica/actor-init-sparql-rdfjs": "^1.9.1",
     "@types/jest": "^24.0.17",
     "@types/minimist": "^1.2.0",
     "@types/n3": "^1.1.0",
@@ -91,6 +92,8 @@
     "global": "^4.4.0",
     "minimist": "^1.2.0",
     "n3": "^1.1.1",
+    "rdf-parse": "^1.1.0",
+    "rdf-store-stream": "^1.0.0",
     "rdf-test-suite": "^1.9.3"
   }
 }
