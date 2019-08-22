@@ -5,19 +5,23 @@ import { ILdfQueryEngine } from "./ILdfQueryEngine";
 import { LdfResponseMocker } from "./mock/LdfResponseMocker";
 import * as stringifyStream from 'stream-to-string';
 import * as cph from '@comunica/actor-http-proxy';
+import * as fse from 'fs-extra';
 import { IDataSource } from "./IDataSource";
+import { LdfUtil } from "../../LdfUtil";
+import { ILdfTestCaseHandler } from "./ILdfTestCaseHandler";
+import { LdfResponseMockerFactory } from "../../factory/LdfResponseMockerFactory";
 
 
 /**
  * Test case handler for https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#LdfQueryEvaluationTest.
  */
-export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCaseEvaluation> {
+export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTestCaseEvaluation> {
 
   constructor(){
 
   }
 
-  public async resourceToTestCase(resource: Resource, testCaseData: ITestCaseData, options?: IFetchOptions): Promise<LdfTestCaseEvaluation> {
+  public async resourceToLdfTestCase(resource: Resource, factory: LdfResponseMockerFactory, testCaseData: ITestCaseData, options?: IFetchOptions): Promise<LdfTestCaseEvaluation> {
     if(!resource.property.action) {
       throw new Error(`Missing mf:action in ${resource}`);
     }
@@ -32,7 +36,6 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
       throw new Error(`Missing qt:query in mf:action of ${resource}`);
     }
     
-
     const queryResponse = await Util.fetchCached(resource.property.result.value, options);
     return new LdfTestCaseEvaluation(
       testCaseData,
@@ -49,7 +52,8 @@ export class LdfTestCaseEvaluationHandler implements ITestCaseHandler<LdfTestCas
           queryResponse.url, queryResponse.body),
         resultSource: queryResponse,
         mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined
-      }
+      },
+      factory
     );
   }
 
@@ -80,32 +84,44 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   public readonly resultSource: IFetchResponse;
   public readonly mockFolder?: string;
 
-  private readonly responseMocker: LdfResponseMocker;
+  private responseMocker: LdfResponseMocker;
+  private readonly factory: LdfResponseMockerFactory;
   private readonly portNr: number;
+  private readonly tmpHdtFolder: string;
+  private createdFolder: boolean;
 
-  constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps){
+  constructor(testCaseData: ITestCaseData, props: ILdfTestaseEvaluationProps, factory: LdfResponseMockerFactory){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
-    this.portNr = Math.floor(Math.random() * 65534) + 1024; // TODO: Maybe a cleaner way to do this?
-    this.responseMocker = new LdfResponseMocker(this.dataSources, this.portNr);
+    this.factory = factory;
+    this.tmpHdtFolder = 'tmpHdt';
+    this.createdFolder = false;
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
-    // Set up mock-server for all sources that need to be mocked
+    // Set up mock-server, load all resources
+    this.responseMocker = await this.factory.getNewLdfResponseMocker();
+    this.responseMocker.loadTest(this.dataSources);
     await this.responseMocker.setUpServer(this);
+
+    // Query and retrieve result
     const result: IQueryResult = await engine.query(this.queryString, { 
-      sources: this.mapSources(this.dataSources),
+      sources: await this.mapSources(this.dataSources),
       httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
     });
+
     // Tear down the mock-server for all sources
     this.responseMocker.tearDownServer();
-    
+    if(this.createdFolder){
+      fse.remove(this.tmpHdtFolder);
+    }
+
     if (! await this.queryResult.equals(result)) {
       throw new Error(`Invalid query evaluation    
 
   Query: ${this.queryString}
 
-  Data: ${this.dataSources || 'none'}     
+  Data: ${JSON.stringify(this.dataSources) || 'none'}     
   
   Result Source: ${this.resultSource.url}    
   
@@ -120,30 +136,37 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
    * Map the manifest-sourceTypes to the sourcetypes the engine uses (based on comunica-engines).
    * @param sources The sources from the manifest file
    */
-  // TODO: Clean this up, this can be done with a map
-  private mapSources(sources: IDataSource[]) : any[] {
-    let rtrn: any[] = [];
-    for(let source of sources){
-      switch(source.type.split('#')[1]){
-        case 'TPF':
-          source.type = '';
-          break;
-        case 'File':
-          source.type = 'file';
-          break;
-        case 'SPARQL':
-          source.type = 'sparql';
-          break;
-        case 'HDT':
-          source.type = 'hdtFile';
-          break;
-        case 'RDFJS':
-          source.type = 'rdfjsSource';
-          break;
+  private mapSources(sources: IDataSource[]) : Promise<any[]> {
+    return new Promise(async (resolve, reject) => {
+      let rtrn: any[] = [];
+      for(let source of sources){
+        switch(source.type.split('#')[1]){
+          case 'TPF':
+            source.type = '';
+            break;
+          case 'File':
+            source.type = 'file';
+            break;
+          case 'SPARQL':
+            source.type = 'sparql';
+            break;
+          case 'HDT':
+            fse.ensureDirSync(this.tmpHdtFolder);
+            let filename: string = await LdfUtil.fetchHdtFile(this.tmpHdtFolder, source.value);
+            this.createdFolder = true;
+            source.type = 'hdtFile';
+            source.value = this.tmpHdtFolder + '/' + filename;
+            break;
+          /*case 'RDFJS':
+            source.type = 'rdfjsSource';
+            break;*/
+          default:
+            throw new Error(`The sourcetype: ${source.type} is not known.`);
+        }
+        rtrn.push(source);
       }
-      rtrn.push(source);
-    }
-    return rtrn;
+      resolve(rtrn);
+    });
   }
 
 }

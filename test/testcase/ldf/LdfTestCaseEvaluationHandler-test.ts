@@ -10,6 +10,8 @@ import { ContextParser } from "jsonld-context-parser";
 import { Resource } from "rdf-object";
 import { QueryResultQuads, ITestCaseData } from "rdf-test-suite";
 import * as streamifyString from 'streamify-string';
+import { LdfMockFetcher } from "../../../lib/testcase/ldf/fetchers/LdfMockFetcher";
+import { LdfResponseMockerFactory } from "../../../lib/factory/LdfResponseMockerFactory";
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {
@@ -17,6 +19,7 @@ import * as streamifyString from 'streamify-string';
   let headers = new Headers({ a: 'b' });
   switch (url) {
   case 'ACTION.ok':
+  case 'a.hdt':
     body = streamifyString(`OK`);
     break;
   case 'ACTION.invalid':
@@ -41,6 +44,8 @@ import * as streamifyString from 'streamify-string';
 const tpfUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF';
 const fileUrl: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File';
 const notSupported: string = 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#NS';
+
+const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(6000);
 
 describe('TestCaseLdfQueryEvaluation', () => {
 
@@ -101,7 +106,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
-      const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+      const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
       expect(testCase).toBeInstanceOf(LdfTestCaseEvaluation);
       expect(testCase.type).toEqual('ldf');
@@ -133,7 +138,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
-      const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+      const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
       expect(testCase).toBeInstanceOf(LdfTestCaseEvaluation);
       expect(testCase.type).toEqual('ldf');
@@ -150,7 +155,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
     it('should error on a resource without action', () => {
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
 
-      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+      return expect(handler.resourceToLdfTestCase(resource, factory, <any> {})).rejects.toBeTruthy();
     });
 
     it('should error on a resource without result', () => {
@@ -159,7 +164,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
       resource.addProperty(pAction, action);
 
-      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+      return expect(handler.resourceToLdfTestCase(resource, factory, <any> {})).rejects.toBeTruthy();
     });
 
     it('should error on a resource without query', () => {
@@ -179,7 +184,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
 
       resource.addProperty(pDataSources, dataSources);
 
-      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+      return expect(handler.resourceToLdfTestCase(resource, factory, <any> {})).rejects.toBeTruthy();
     });
 
     it('should error on an empty sources list', () => {
@@ -198,7 +203,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
-      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+      return expect(handler.resourceToLdfTestCase(resource, factory, <any> {})).rejects.toBeTruthy();
     });
 
     it('should error when the result is unreadable', () => {
@@ -217,7 +222,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
-      return expect(handler.resourceToTestCase(resource, <any> {})).rejects.toBeTruthy();
+      return expect(handler.resourceToLdfTestCase(resource, factory, <any> {})).rejects.toBeTruthy();
     });
 
   });
@@ -243,6 +248,8 @@ describe('LdfTestCaseEvaluation', () => {
   let pSourceType;
   let pTPF;
   let pFile;
+  let pHDT;
+  let pUnknown;
   let pDataSources;
   let pSource;
   let pMockFolder;
@@ -264,6 +271,10 @@ describe('LdfTestCaseEvaluation', () => {
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
         pFile = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File'), context });
+        pHDT = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File'), context });
+        pUnknown = new Resource(
+          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#Unknown'), context });
         pDataSources = new Resource(
           { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#dataSources'), context });
         pSource = new Resource(
@@ -292,7 +303,7 @@ describe('LdfTestCaseEvaluation', () => {
         queryResult: null,
         resultSource: {body: undefined, headers: undefined, url: undefined},
       }
-      let testcase = new LdfTestCaseEvaluation(testCaseData, props);
+      let testcase = new LdfTestCaseEvaluation(testCaseData, props, factory);
       expect(testcase).toBeInstanceOf(LdfTestCaseEvaluation);
       expect(testcase.dataSources).toEqual([]);
     });
@@ -313,7 +324,7 @@ describe('LdfTestCaseEvaluation', () => {
         queryResult: null,
         resultSource: null,
       }
-      let testcase = new LdfTestCaseEvaluation(testCaseData, props);
+      let testcase = new LdfTestCaseEvaluation(testCaseData, props, factory);
       return expect(testcase.test(engine, {})).rejects.toBeTruthy();
     });
 
@@ -338,7 +349,7 @@ describe('LdfTestCaseEvaluation', () => {
         resource.addProperty(pAction, action);
         resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
 
-        const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+        const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
   
         return expect(testCase.test(engine, {})).resolves.toBe(undefined);
       });
@@ -362,7 +373,7 @@ describe('LdfTestCaseEvaluation', () => {
         resource.addProperty(pResult, new Resource({ term: literal('RESULT_other.ttl'), context }));
         resource.addProperty(pDataSources, dataSources);
 
-        const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+        const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
   
         return expect(testCase.test(engine, {})).rejects.toBeTruthy();
       });
@@ -390,7 +401,7 @@ describe('LdfTestCaseEvaluation', () => {
         resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
         resource.addProperty(pDataSources, dataSources);
 
-        const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+        const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
         return expect(testCase.test(engine, {})).resolves.toBe(undefined);
       });
@@ -414,9 +425,37 @@ describe('LdfTestCaseEvaluation', () => {
         resource.addProperty(pResult, new Resource({ term: literal('RESULT_other.ttl'), context }));
         resource.addProperty(pDataSources, dataSources);
 
-        const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+        const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
         return expect(testCase.test(engine, {})).rejects.toBeTruthy();
+      });
+
+    });
+
+    describe('UNKNOWN',() => {
+
+      it('should throw an error', async () => {
+        const resource = new Resource({ term: namedNode('http://example.org/test'), context });
+        const action = new Resource({ term: namedNode('blabla'), context });
+        action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
+        action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+
+        const src1 : Resource = new Resource({ term: blankNode(), context });
+        src1.addProperty(pSource, new Resource({ term: literal('http://ex2.org'), context }));
+        src1.addProperty(pSourceType, pUnknown);
+        const sources : Resource[] = [
+          src1
+        ];
+        const dataSources = new Resource({ term: blankNode(), context });
+        dataSources.list = sources;
+
+        resource.addProperty(pAction, action);
+        resource.addProperty(pResult, new Resource({ term: literal('RESULT_other.ttl'), context }));
+        resource.addProperty(pDataSources, dataSources);
+
+        const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
+
+        expect(testCase.test(engine, {})).rejects.toThrowError();
       });
 
     });

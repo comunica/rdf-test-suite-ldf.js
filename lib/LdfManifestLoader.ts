@@ -1,5 +1,6 @@
-import { manifestFromResource, IFetchOptions, IManifest, ITestCaseHandler, ITestCase, IManifestLoaderArgs, ManifestLoader, Util } from "rdf-test-suite";
+import { IFetchOptions, IManifest, ITestCaseHandler, ITestCase, IManifestLoaderArgs, ManifestLoader, Util } from "rdf-test-suite";
 import { RdfObjectLoader, Resource } from "rdf-object";
+import { ldfManifestFromResource } from "./ILdfManifest";
 
 export class LdfManifestLoader extends ManifestLoader {
   
@@ -27,7 +28,7 @@ export class LdfManifestLoader extends ManifestLoader {
   public async from(url: string, options?: IFetchOptions): Promise<IManifest> {
     const objectLoader = new RdfObjectLoader({ context: LdfManifestLoader.LOADER_CONTEXT });
     const manifest: Resource = await this.import(objectLoader, url, options);
-    return manifestFromResource(this.ldfTestCaseHandlers, options, manifest);
+    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest);
   }
 
 }

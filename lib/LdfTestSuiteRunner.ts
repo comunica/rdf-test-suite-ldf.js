@@ -1,5 +1,7 @@
 import { TestSuiteRunner, IManifest, ITestResult, ITestSuiteConfig } from "rdf-test-suite";
 import { LdfManifestLoader } from "./LdfManifestLoader";
+import { WriteStream } from "fs";
+import Timeout = NodeJS.Timeout;
 
 /**
  * The LdfTestSuiteRunner runs ldf-query-engine test manifests.

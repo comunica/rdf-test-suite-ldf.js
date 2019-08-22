@@ -1,10 +1,11 @@
 import { Server } from "http";
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
 import { IMockedResponse, LdfMockFetcher } from "../fetchers/LdfMockFetcher";
-import * as http from 'http';
-import * as https from 'https';
 import { IDataSource } from "../IDataSource";
 import { ifStatement } from "@babel/types";
+import { Util } from "rdf-test-suite";
+import * as http from 'http';
+import { LdfUtil } from "../../../LdfUtil";
 
 
 export class LdfResponseMocker {
@@ -16,13 +17,15 @@ export class LdfResponseMocker {
   private whiteList: string[];
 
 
-  constructor(dataSources: IDataSource[], port?: number){
-    // server will be initialized when testing
+  constructor(port?: number){
+    // server will be initialized later
     this.dummyServer = undefined;
+
+    // datasources will be initialized when a test is loaded
+    this.dataSources = undefined;
+
     this.port = port ? port : 3000; // Defaul port is 3000
     this.proxyAddress = `http://127.0.0.1:${this.port}/` // Proxy address 
-    this.dataSources = dataSources;
-    this.fillWhiteList();
   }
 
    /**
@@ -44,7 +47,7 @@ export class LdfResponseMocker {
             headers: args.headers
           }
 
-          let client = this.getHttpSClient(query.split('/')[0]);
+          let client = LdfUtil.getHttpSClient(query.split('/')[0]);
 
           // Forward request and pipe to requesting instance
           let connector = client.request(query, options, (resp: any) => {
@@ -75,6 +78,14 @@ export class LdfResponseMocker {
   }
 
   /**
+   * Set up the server for the upcoming test, this makes sure the LdfResponseMocker is re-usable
+   */
+  public loadTest(dataSources: IDataSource[]): void {
+    this.dataSources = dataSources;
+    this.fillWhiteList();
+  }
+
+  /**
    * Fill the whitelist with sources which are allowed to pass through the proxy and shouldn't be mocked.
    */
   public fillWhiteList() : void {
@@ -92,23 +103,11 @@ export class LdfResponseMocker {
    * @param dataSource The datasource 
    */
   public isWhiteListed(dataSource: string) : boolean {
+    if(! this.whiteList) return false;
     for(let source of this.whiteList){
       if(source.startsWith(dataSource)) return true;
     }
     return false;
-  }
-
-  /**
-   * Get a http(s)-client for requesting depending on the used protocol
-   * @param protocol The protocol based for whom we want a http(s)client 
-   */
-  public getHttpSClient(protocol: string) : any {
-    switch(protocol){
-      case "http:":
-        return http;
-      case "https:":
-        return https;
-    }
   }
 
 }

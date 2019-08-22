@@ -7,6 +7,7 @@ import { LdfResponseMocker } from "../../../../lib/testcase/ldf/mock/LdfResponse
 import * as quad from 'rdf-quad';
 import *  as streamifyString from 'streamify-string';
 import * as phs from '@comunica/actor-http-proxy';
+import { LdfResponseMockerFactory } from "../../../../lib/factory/LdfResponseMockerFactory";
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {
@@ -26,6 +27,8 @@ import * as phs from '@comunica/actor-http-proxy';
   }
   return Promise.resolve(new Response(body, <any> { headers, status: 200, url }));
 };
+
+const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(7000);
 
 describe('LdfResponseMocker', () => {
 
@@ -80,9 +83,7 @@ describe('LdfResponseMocker', () => {
   describe('#setUpServer', () => {
 
     it('should set up a reachable and working server', async () => {
-      let mocker: LdfResponseMocker = new LdfResponseMocker([
-        {type: 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF', value: 'http://ex2.org'}
-      ], 4444);
+      let mocker: LdfResponseMocker = await factory.getNewLdfResponseMocker();
 
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
@@ -102,7 +103,7 @@ describe('LdfResponseMocker', () => {
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
-      const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
+      const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
       await mocker.setUpServer(testCase);
 
@@ -118,14 +119,12 @@ describe('LdfResponseMocker', () => {
         Util.identifyContentType('RESULT.ttl', queryResponse.headers),
         queryResponse.url, queryResponse.body);
         
-      expect(mocker.proxyAddress).toEqual('http://127.0.0.1:4444/');
+      expect(mocker.proxyAddress).toEqual('http://127.0.0.1:7000/');
       expect(await queryResult.equals(result)).toBeTruthy();
     });
 
     it('should forward request over https', async () => {
-      let mocker: LdfResponseMocker = new LdfResponseMocker([
-        {type: 'https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File', value: 'https://ex2.org'}
-      ], 4444);
+      let mocker: LdfResponseMocker = await factory.getNewLdfResponseMocker();
 
       const resource = new Resource({ term: namedNode('http://example.org/test'), context });
       const action = new Resource({ term: namedNode('blabla'), context });
@@ -145,14 +144,20 @@ describe('LdfResponseMocker', () => {
       resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
-      const testCase: LdfTestCaseEvaluation = await handler.resourceToTestCase(resource, <any> {});
-      
+      const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
+
+      expect(mocker.isWhiteListed(undefined)).toBeFalsy();
+      mocker.loadTest(testCase.dataSources);
+
       expect(mocker.isWhiteListed('https://ex2.org')).toBeTruthy();
       expect(mocker.isWhiteListed('https://ex3.org')).toBeFalsy();
-      expect(mocker.getHttpSClient('http:')).toEqual(require('http'));
-      expect(mocker.getHttpSClient('https:')).toEqual(require('https')); 
       mocker.tearDownServer();
       mocker.tearDownServer();
+    });
+
+    it('should use the default port', () => {
+      let mock: LdfResponseMocker = new LdfResponseMocker();
+      expect(mock.proxyAddress).toEqual('http://127.0.0.1:3000/');
     });
   });
 

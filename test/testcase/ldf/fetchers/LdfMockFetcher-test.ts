@@ -2,6 +2,7 @@ import { LdfTestCaseEvaluation, ILdfTestaseEvaluationProps } from "../../../../l
 import { ITestCaseData } from "rdf-test-suite";
 import { LdfMockFetcher, IMockedResponse } from "../../../../lib/testcase/ldf/fetchers/LdfMockFetcher";
 import * as nock from 'nock';
+import { LdfResponseMockerFactory } from "../../../../lib/factory/LdfResponseMockerFactory";
 
 describe('LdfMockFetcher', () => {
 
@@ -23,7 +24,7 @@ describe('LdfMockFetcher', () => {
     resultSource: null,
     mockFolder: 'https://md.bu/mockfolder'
   }
-  let object = new LdfTestCaseEvaluation(testCaseData, props);
+  let object = new LdfTestCaseEvaluation(testCaseData, props, new LdfResponseMockerFactory(5000));
 
   describe('#parseMockedResponse', () => {
 
