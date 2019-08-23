@@ -11,9 +11,9 @@ import { LdfUtil } from "../../LdfUtil";
 import { ILdfTestCaseHandler } from "./ILdfTestCaseHandler";
 import { LdfResponseMockerFactory } from "../../factory/LdfResponseMockerFactory";
 import { storeStream } from "rdf-store-stream";
-import { request, ClientRequest } from "http";
 const rdfParser = require('rdf-parse').default;
 import * as C from '../../Colors';
+import * as Path from 'path';
 
 /**
  * Test case handler for https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#LdfQueryEvaluationTest.
@@ -157,13 +157,13 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             this.createdFolder = true;
 
             is.type = 'hdtFile';
-            is.value = this.tmpHdtFolder + '/' + hdtFile;
+            is.value = Path.join(process.cwd(), this.tmpHdtFolder, hdtFile);
             break;
           case 'RDFJS':
             fse.ensureDirSync(this.tmpHdtFolder);
 
             let rdfjsFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
-            let stream : NodeJS.ReadableStream = fse.createReadStream(this.tmpHdtFolder + '/' + rdfjsFile);        
+            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(process.cwd(), this.tmpHdtFolder, rdfjsFile));        
             const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
 
             this.createdFolder = true;

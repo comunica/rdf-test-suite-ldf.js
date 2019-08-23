@@ -10,14 +10,15 @@ import * as C from '../lib/Colors';
 const args = minimist(process.argv.slice(2));
 
 if (args._.length < 2) {
-  console.error(`${C.inColor('rdf-test-suite-ldf executes test suites for engine-testing', C.GREEN)}
+  console.error(`${C.inColor(`rdf-test-suite-ldf executes test suites for engine-testing. 
+rdf-test-suite-ldf currently supports testing for the following sourcetypes: HDT, LD-Files, RDFJ, SPARQL, TPF.`, C.CYAN)}
 
 ${C.inColor('Usage:', C.YELLOW)}
   rdf-test-suite-ldf path/to/myengine.js http://w3c.github.io/rdf-tests/sparql11/data-sparql11/manifest-all.ttl
   rdf-test-suite-ldf path/to/myengine.js http://w3c.github.io/rdf-tests/sparql11/data-sparql11/manifest-all.ttl \
-    -s http://www.w3.org/TR/sparql11-query/
+-s http://www.w3.org/TR/sparql11-query/
   rdf-test-suite-ldf path/to/myengine.js http://w3c.github.io/rdf-tests/sparql11/data-sparql11/manifest-all.ttl \
-    -o earl -p earl-meta.json > earl.ttl
+-o earl -p earl-meta.json > earl.ttl
 
 ${C.inColor('Options:', C.YELLOW)}
   -o    output format (detailed, summary, eurl, ... defaults to detailed)
@@ -44,7 +45,7 @@ if (args.c) {
 }
 
 // Import the engine
-const engine = require(process.cwd() + '/' + args._[0]);
+const engine = require(Path.join(process.cwd(), args._[0]));
 
 const defaultConfig = {
   exitWithStatusCode0: false,
