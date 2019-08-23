@@ -13,6 +13,7 @@ import { LdfResponseMockerFactory } from "../../factory/LdfResponseMockerFactory
 import { storeStream } from "rdf-store-stream";
 import { request, ClientRequest } from "http";
 const rdfParser = require('rdf-parse').default;
+import * as C from '../../Colors';
 
 /**
  * Test case handler for https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#LdfQueryEvaluationTest.
@@ -115,17 +116,17 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     }
 
     if (! await this.queryResult.equals(result)) {
-      throw new Error(`Invalid query evaluation    
+      throw new Error(`${C.inColor('Invalid query evaluation', C.RED)}
 
-  Query: ${this.queryString}
+  ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
 
-  Data: ${JSON.stringify(this.dataSources) || 'none'}     
+  ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}     
   
-  Result Source: ${this.resultSource.url}    
+  ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}    
   
-  Expected: ${this.queryResult}     
+  ${C.inColor('Expected:', C.YELLOW)} ${this.queryResult}     
   
-  Got: \n ${result.toString()}
+  ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
 `);
     }
   }
