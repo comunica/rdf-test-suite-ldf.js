@@ -30,7 +30,7 @@ Example engines based on the [comunica](https://github.com/comunica/comunica#rea
 The following command executes the [tpf-manifest test suite](#TODO) on the engine: `myengine.js`:
 
 ```bash
-$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/tpf-manifest.ttl
+$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/ldf-manifest.ttl
 ```
 
 This command will output something like this:
@@ -55,13 +55,29 @@ CONSTRUCT WHERE { ?s ?p ?o}
 ✖ 1 / 2 tests succeeded!
 ```
 
+### Start port for mocking
+
+With the `-r` flag you can decide on which port mock-servers start spawning, e.g. 5000. If an invalid port is given or if not enough (consecutive) ports are available an error will be thrown.
+
+```
+$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/ldf-manifest.ttl -r 6000
+```
+
+### Extra details on HTTP caching
+
+The `-c` flag inherited from [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) does also work in **rdf-test-suite-ldf**. For HDT- and RDFJS-testing files should and will be (temporarily) stored in local memory. These files will be deleted by default but when the `-c` flag is given, all those files will be stored in the directory given with this flag. These files can be used the next time to avoid re-fetching files from servers.
+
 ### Extra options
 
 A list of extra options, inherited from [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) can be found [here](https://github.com/rubensworks/rdf-test-suite.js/blob/master/README.md#test-filtering).
 
+```
+$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/ldf-manifest.ttl -c path/to/dir
+```
+
 ## Some default test suites
 
-I will create and publish some default test-suites which can be found [here](#TODO)
+I will create and publish some default test-suites which can be found [here](https://github.com/ManuDeBuck/engine-ontology/tree/master/examples)
 
 ## License
 
