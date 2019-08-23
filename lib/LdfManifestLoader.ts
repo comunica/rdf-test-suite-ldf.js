@@ -25,10 +25,10 @@ export class LdfManifestLoader extends ManifestLoader {
    * @param {IFetchOptions} options The fetch options.
    * @return {Promise<IManifest>} A promise that resolves to a manifest object.
    */
-  public async from(url: string, options?: IFetchOptions): Promise<IManifest> {
+  public async from(url: string, options?: IFetchOptions, startPort?: number): Promise<IManifest> {
     const objectLoader = new RdfObjectLoader({ context: LdfManifestLoader.LOADER_CONTEXT });
     const manifest: Resource = await this.import(objectLoader, url, options);
-    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest);
+    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest, startPort);
   }
 
 }

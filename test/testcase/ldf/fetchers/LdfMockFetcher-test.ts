@@ -1,4 +1,4 @@
-import { LdfTestCaseEvaluation, ILdfTestaseEvaluationProps } from "../../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
+import { LdfTestCaseEvaluation, ILdfTestCaseEvaluationProps } from "../../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import { ITestCaseData } from "rdf-test-suite";
 import { LdfMockFetcher, IMockedResponse } from "../../../../lib/testcase/ldf/fetchers/LdfMockFetcher";
 import * as nock from 'nock';
@@ -16,7 +16,7 @@ describe('LdfMockFetcher', () => {
     approval: "",
     approvedBy: "",
   };
-  let props: ILdfTestaseEvaluationProps = {
+  let props: ILdfTestCaseEvaluationProps = {
     baseIRI: "",
     queryString: "",
     dataSources: [],

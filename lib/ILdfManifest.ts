@@ -11,9 +11,9 @@ import { LdfResponseMockerFactory } from "./factory/LdfResponseMockerFactory";
  * @return {Promise<IManifest>} A promise resolving to a manifest object.
  */
 export async function ldfManifestFromResource(testCaseHandlers: {[uri: string]: ITestCaseHandler<ITestCase<any>>},
-                                              options: IFetchOptions, resource: Resource): Promise<IManifest> {
+                                              options: IFetchOptions, resource: Resource, startPort?: number): Promise<IManifest> {
   // The factory will allow each ITestCase to setup a mocking server if needed
-  let factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(3000);
+  let factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(startPort);
   let res: IManifest = {
     comment: resource.property.comment ? resource.property.comment.value : null,
     label: resource.property.label ? resource.property.label.value : null,

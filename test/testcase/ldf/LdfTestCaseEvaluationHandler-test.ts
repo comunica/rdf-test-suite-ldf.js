@@ -3,7 +3,7 @@ import "jest-rdf";
 import {
   LdfTestCaseEvaluation,
   LdfTestCaseEvaluationHandler,
-  ILdfTestaseEvaluationProps,
+  ILdfTestCaseEvaluationProps,
 } from "../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import * as quad from 'rdf-quad';
 import { ContextParser } from "jsonld-context-parser";
@@ -296,7 +296,7 @@ describe('LdfTestCaseEvaluation', () => {
         approval: "",
         approvedBy: "",
       };
-      let props: ILdfTestaseEvaluationProps = {
+      let props: ILdfTestCaseEvaluationProps = {
         baseIRI: "",
         queryString: "",
         dataSources: [],
@@ -317,7 +317,7 @@ describe('LdfTestCaseEvaluation', () => {
         approval: "",
         approvedBy: "",
       };
-      let props: ILdfTestaseEvaluationProps = {
+      let props: ILdfTestCaseEvaluationProps = {
         baseIRI: "",
         queryString: "",
         dataSources: [],

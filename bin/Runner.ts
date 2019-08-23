@@ -4,7 +4,7 @@ import * as minimist from 'minimist';
 import {StreamWriter} from "n3";
 import * as Path from "path";
 import {ITestResult, ITestSuiteConfig, TestSuiteRunner} from "rdf-test-suite";
-import { LdfTestSuiteRunner } from "../lib/LdfTestSuiteRunner";
+import { LdfTestSuiteRunner, ILdfTestSuiteConfig } from "../lib/LdfTestSuiteRunner";
 
 const args = minimist(process.argv.slice(2));
 
@@ -28,6 +28,7 @@ Options:
   -i    JSON string with custom options that need to be passed to the engine
   -d    time out duration for test cases (in milliseconds, default 5000)
   -m    URL to local path mapping (e.g. 'https://w3c.github.io/json-ld-api/|/path/to/folder/')
+  -r    The port number on which the mocking servers will start spawning (3000 by default)
 `);
   process.exit(1);
 }
@@ -51,7 +52,7 @@ const defaultConfig = {
   // A higher timeOutDuration than the original rdf-test-suite because of more overhead w/ mock servers
 };
 
-const config: ITestSuiteConfig = {
+const config: ILdfTestSuiteConfig = {
   cachePath,
   customEngingeOptions: args.i ? JSON.parse(args.i) : {},
   exitWithStatusCode0: !!args.e || defaultConfig.exitWithStatusCode0,
@@ -60,6 +61,7 @@ const config: ITestSuiteConfig = {
   testRegex: new RegExp(args.t),
   timeOutDuration: args.d || defaultConfig.timeOutDuration,
   urlToFileMapping: args.m,
+  startPort: args.r
 };
 
 // Fetch the manifest, run the tests, and print them
