@@ -3,7 +3,7 @@
 
 This is a nodejs CLI-tool which executes integration-tests on query-engines such as the [comunica-engines](https://github.com/ManuDeBuck/comunica-engines) and is based on the [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) written by [Ruben Taelman](https://github.com/rubensworks).
 
-It uses test-manifests (you can find examples on the _engine-ontology_ repository) which are based on the [engine-ontology](https://github.com/ManuDeBuck/engine-ontology) to test the integration of your engine.
+It uses test-manifests (you can find examples on the query-testing-ontology_ repository) which are based on the [query-testing-ontology](https://github.com/ManuDeBuck/query-testing-ontology) to test the integration of your engine.
 
 ## Installation
 
@@ -23,34 +23,34 @@ $ yarn add --dev rdf-test-suite-ldf
 
 When the `rdf-test-suite-ldf` script is installed you're good to go. You will need some kind of javascript-_engine_ which follows the [`ILdfQueryEngine`](https://github.com/ManuDeBuck/rdf-test-suite-ldf.js/blob/master/lib/testcase/ldf/ILdfQueryEngine.ts) interface as first argument and an engine-test manifest URI as second argument.
 
-Example engines based on the [comunica](https://github.com/comunica/comunica#readme) query engine platform can be found [here](https://github.com/ManuDeBuck/comunica-engines). Example test-suites **(with failing tests, used for testing-purposes)** can be found [here](https://manudebuck.github.io/engine-ontology/examples/select-manifest.ttl) and [here](https://manudebuck.github.io/engine-ontology/examples/construct-manifest.ttl). 
+Example engines based on the [comunica](https://github.com/comunica/comunica#readme) query engine platform can be found [here](https://github.com/ManuDeBuck/comunica-engines). Example test-suites **(with failing tests, used for testing-purposes)** can be found [here](https://manudebuck.github.io/query-testing-ontology/examples/ldf-manifest.ttl) and [here](https://manudebuck.github.io/query-testing-ontology/examples/file-manifest.ttl). 
 
 ### Basic execution
 
 The following command executes the [tpf-manifest test suite](#TODO) on the engine: `myengine.js`:
 
 ```bash
-$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/ldf-manifest.ttl
+$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/query-testing-ontology/examples/ldf-manifest.ttl
 ```
 
 This command will output something like this:
 
 ```bash
-✔ constructwhere01 - CONSTRUCT WHERE (https://manudebuck.github.io/engine-ontology/examples/construct-manifest.ttl#constructwhere01)
-✖ constructwhere02 - CONSTRUCT WHERE SHOULD FAIL (https://manudebuck.github.io/engine-ontology/examples/construct-manifest.ttl#constructwhere02)
+✔ constructwhere01 - CONSTRUCT WHERE (https://manudebuck.github.io/query-testing-ontology/examples/construct-manifest.ttl#constructwhere01)
+✖ constructwhere02 - CONSTRUCT WHERE SHOULD FAIL (https://manudebuck.github.io/query-testing-ontology/examples/construct-manifest.ttl#constructwhere02)
   Query: PREFIX : <http://example.org/>
 
 CONSTRUCT WHERE { ?s ?p ?o}
 
-  Data: https://manudebuck.github.io/engine-ontology/examples/data.ttl
+  Data: https://manudebuck.github.io/query-testing-ontology/examples/data.ttl
   
-  Result Source: https://manudebuck.github.io/engine-ontology/examples/constructwhere02result.ttl
+  Result Source: https://manudebuck.github.io/query-testing-ontology/examples/constructwhere02result.ttl
   
   Expected: ...
 
   Got: ...
 
-  More info: https://manudebuck.github.io/engine-ontology/examples/construct-manifest.ttl#constructwhere02
+  More info: https://manudebuck.github.io/query-testing-ontology/examples/construct-manifest.ttl#constructwhere02
 
 ✖ 1 / 2 tests succeeded!
 ```
@@ -60,7 +60,7 @@ CONSTRUCT WHERE { ?s ?p ?o}
 With the `-r` flag you can decide on which port mock-servers start spawning, e.g. 5000. If an invalid port is given or if not enough (consecutive) ports are available an error will be thrown.
 
 ```
-$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/ldf-manifest.ttl -r 6000
+$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/query-testing-ontology/examples/ldf-manifest.ttl -r 6000
 ```
 
 ### Extra details on HTTP caching
@@ -72,12 +72,12 @@ The `-c` flag inherited from [rdf-test-suite.js](https://github.com/rubensworks/
 A list of extra options, inherited from [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) can be found [here](https://github.com/rubensworks/rdf-test-suite.js/blob/master/README.md#test-filtering).
 
 ```
-$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/engine-ontology/examples/ldf-manifest.ttl -c path/to/dir
+$ rdf-test-suite-ldf myengine.js http://manudebuck.github.io/query-testing-ontology/examples/ldf-manifest.ttl -c path/to/dir
 ```
 
 ## Some default test suites
 
-I will create and publish some default test-suites which can be found [here](https://github.com/ManuDeBuck/engine-ontology/tree/master/examples)
+I will create and publish some default test-suites which can be found [here](https://github.com/ManuDeBuck/query-testing-ontology/tree/master/examples)
 
 ## License
 

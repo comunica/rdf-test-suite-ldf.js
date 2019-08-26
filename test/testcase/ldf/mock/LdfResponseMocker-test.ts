@@ -65,17 +65,17 @@ describe('LdfResponseMocker', () => {
         pResult = new Resource(
           { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
         pSourceType = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#sourceType'), context });
+          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#sourceType'), context });
         pTPF = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#TPF'), context });
+          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF'), context });
         pFile = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#File'), context })
+          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#File'), context })
         pDataSources = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#dataSources'), context });
+          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#dataSources'), context });
         pSource = new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#source'), context });
+          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#source'), context });
         pMockFolder =  new Resource(
-          { term: namedNode('https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#mockFolder'), context });
+          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#mockFolder'), context });
         done();
       });
   });

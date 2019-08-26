@@ -16,7 +16,7 @@ import * as C from '../../Colors';
 import * as Path from 'path';
 
 /**
- * Test case handler for https://manudebuck.github.io/engine-ontology/engine-ontology.ttl#LdfQueryEvaluationTest.
+ * Test case handler for https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#LdfQueryEvaluationTest.
  */
 export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTestCaseEvaluation> {
 
@@ -104,28 +104,30 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     await this.responseMocker.setUpServer(this);
 
     // Query and retrieve result
+    const sources: ISource[] | void = await this.mapSources(this.dataSources).catch((reason: string) => {
+      this.responseMocker.tearDownServer();
+      throw new Error(reason);
+    });
     const result: IQueryResult = await engine.query(this.queryString, { 
-      sources: await this.mapSources(this.dataSources),
+      sources: sources,
       httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
     });
-
     // Tear down the mock-server for all sources
     this.responseMocker.tearDownServer();
     if(this.createdFolder){
       fse.emptyDirSync(this.tmpHdtFolder);
     }
-
     if (! await this.queryResult.equals(result)) {
       throw new Error(`${C.inColor('Invalid query evaluation', C.RED)}
 
   ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
 
   ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}     
-  
+    
   ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}    
-  
-  ${C.inColor('Expected:', C.YELLOW)} ${this.queryResult}     
-  
+    
+  ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}     
+    
   ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
 `);
     }
@@ -165,14 +167,14 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             let rdfjsFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
             let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(process.cwd(), this.tmpHdtFolder, rdfjsFile));        
             const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
-
+            
             this.createdFolder = true;
 
             is.value = await storeStream(quadStream);
             is.type = 'rdfjsSource';
             break;
           default:
-            throw new Error(`The sourcetype: ${source.type} is not known.`);
+            reject(`The sourcetype: ${source.type} is not known.`);
         }
         rtrn.push(source);
       }

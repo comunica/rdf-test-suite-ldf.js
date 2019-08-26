@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { IDataSource } from './testcase/ldf/IDataSource';
 import * as Path from "path";
+const fetch = require('node-fetch');
 
 /**
  * A class with utility functions.
@@ -37,8 +38,7 @@ export class LdfUtil {
    * @param folder: The folder where the temporary file should be saved
    * @param source: The IDataSource representing the source that should be fetched
    */
-  /* istanbul ignore next */
-  public static fetchFile(folder: string, source: IDataSource): Promise<string> {
+  public static async fetchFile(folder: string, source: IDataSource): Promise<string> {
     return new Promise(async (resolve, reject) => {
       let iri: string = source.value;
       // we want to re-use the current filename for the temp file
