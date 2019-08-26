@@ -91,8 +91,8 @@ export class LdfResponseMocker {
   public fillWhiteList() : void {
     this.whiteList = [];
     for(let source of this.dataSources){
-      if(source.type != 'https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF'
-      && source.type != 'https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#SPARQL'){
+      if(source.type != 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF'
+      && source.type != 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#SPARQL'){
       this.whiteList.push(source.value);
       }
     }

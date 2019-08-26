@@ -70,7 +70,7 @@ export class LdfMockFetcher {
   }
 
   /**
-   * Parse the headers of a mocked testfile (cfr. https://github.com/ManuDeBuck/query-testing-ontology#README).
+   * Parse the headers of a mocked testfile (cfr. https://github.com/comunica/ontology-query-testing#README).
    * @param headers The header lines of the mocked testfile.
    * @returns a map with the header values.
    */

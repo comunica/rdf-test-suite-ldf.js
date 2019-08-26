@@ -16,7 +16,7 @@ import * as C from '../../Colors';
 import * as Path from 'path';
 
 /**
- * Test case handler for https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#LdfQueryEvaluationTest.
+ * Test case handler for https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#LdfQueryEvaluationTest.
  */
 export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTestCaseEvaluation> {
 

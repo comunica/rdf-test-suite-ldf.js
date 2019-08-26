@@ -1,13 +1,14 @@
 import * as fs from 'fs';
+import * as fse from "fs-extra";
 import * as nock from 'nock';
 import * as Path from 'path';
 import { Util } from "rdf-test-suite";
 import { LdfUtil } from "../../lib/LdfUtil";
 
 describe('LdfUtil', () => {
-  const fileUrl = "https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#File";
-  const tpfUrl = "https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF";
-  const notSupportedUrl = "https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl/NSU";
+  const fileUrl = "https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File";
+  const tpfUrl = "https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF";
+  const notSupportedUrl = "https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl/NSU";
   const tmpDir = 'test/testcase/tempfiles';
 
   describe('#removePrefix', () => {
@@ -38,7 +39,7 @@ describe('LdfUtil', () => {
       const filename = await LdfUtil.fetchFile(Path.join('test', 'testcase', 'tempfiles'),
         { value: 'http://md.bu/file.ttl', type: '' });
       expect(filename).toEqual('file.ttl');
-
+      fse.removeSync(Path.join(process.cwd(), 'test', 'testcase', 'tempfiles', 'file.ttl'));
     });
 
   });

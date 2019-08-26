@@ -65,17 +65,17 @@ describe('LdfResponseMocker', () => {
         pResult = new Resource(
           { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
         pSourceType = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#sourceType'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#sourceType'), context });
         pTPF = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF'), context });
         pFile = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#File'), context })
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File'), context })
         pDataSources = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#dataSources'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#dataSources'), context });
         pSource = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#source'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#source'), context });
         pMockFolder =  new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#mockFolder'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
         done();
       });
   });
@@ -94,7 +94,7 @@ describe('LdfResponseMocker', () => {
       src1.addProperty(pSource, new Resource({ term: literal('https://ex2.org'), context }));
       src1.addProperty(pSourceType, pTPF);
       const sources : Resource[] = [
-        src1
+        src1,
       ];
       const dataSources = new Resource({ term: blankNode(), context });
       dataSources.list = sources;

@@ -36,7 +36,7 @@
   "useNativeTypes": "jld:useNativeTypes",
   "useRdfType": "jld:useRdfType",
 
-  "et": "https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#",
+  "et": "https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#",
   "sourceType": "et:sourceType",
   "mockFolder": "et:mockFolder",
   "dataSources": "et:dataSources",

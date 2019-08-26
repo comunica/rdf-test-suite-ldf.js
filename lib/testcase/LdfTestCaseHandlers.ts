@@ -5,7 +5,7 @@ import { LdfTestCaseEvaluationHandler } from "./ldf/LdfTestCaseEvaluationHandler
 module.exports = {
 
   // Ldf test suite
-  'https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#LdfQueryEvaluationTest':
+  'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#LdfQueryEvaluationTest':
     new LdfTestCaseEvaluationHandler(),
 
 };

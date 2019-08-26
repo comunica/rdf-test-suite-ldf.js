@@ -40,9 +40,9 @@ import { LdfResponseMockerFactory } from "../../../lib/factory/LdfResponseMocker
 };
 
 // Urls representing the possible sourceTypes for a TestCaseLdfQueryEvaluationhandler
-const tpfUrl: string = 'https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF';
-const fileUrl: string = 'https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#File';
-const notSupported: string = 'https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#NS';
+const tpfUrl: string = 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF';
+const fileUrl: string = 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File';
+const notSupported: string = 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#NS';
 
 const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(6000);
 
@@ -72,15 +72,15 @@ describe('TestCaseLdfQueryEvaluation', () => {
         pResult = new Resource(
           { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
         pSourceType = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#sourceType'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#sourceType'), context });
         pTPF = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF'), context });
         pDataSources = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#dataSources'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#dataSources'), context });
         pSource = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#source'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#source'), context });
         pMockFolder =  new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#mockFolder'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
         done();
       });
   });
@@ -266,23 +266,23 @@ describe('LdfTestCaseEvaluation', () => {
         pResult = new Resource(
           { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
         pSourceType = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#sourceType'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#sourceType'), context });
         pTPF = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#TPF'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF'), context });
         pFile = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#File'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File'), context });
         pHDT = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#HDT'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#HDT'), context });
         pRDFJS = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#RDFJS') })
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#RDFJS') })
         pUnknown = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#Unknown'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#Unknown'), context });
         pDataSources = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#dataSources'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#dataSources'), context });
         pSource = new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#source'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#source'), context });
         pMockFolder =  new Resource(
-          { term: namedNode('https://manudebuck.github.io/query-testing-ontology/query-testing-ontology.ttl#mockFolder'), context });
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
         done();
       });
   });

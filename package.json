@@ -1,23 +1,23 @@
 {
   "name": "rdf-test-suite-ldf",
-  "version": "1.0.0",
   "description": "An engine testing suite",
   "keywords": [
     "sparql",
     "ldf",
     "linked data",
     "query engine",
-    "test suite"
+    "test suite",
+    "testing"
   ],
   "main": "index.js",
   "typings": "index",
-  "repository": "https://github.com/ManuDeBuck/rdf-test-suite-ldf.js.git",
-  "author": "Manu De Buck <manu.debuck@telenet.be>",
+  "repository": "https://github.com/comunica/rdf-test-suite-ldf.js.git",
+  "author": "Manu De Buck <manu@mdebuck.org>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ManuDeBuck/rdf-test-suite-ldf.js/issues"
+    "url": "https://github.com/comunica/rdf-test-suite-ldf.js/issues"
   },
-  "homepage": "https://github.com/ManuDeBuck/rdf-test-suite-ldf.js#readme",
+  "homepage": "https://github.com/comunica/rdf-test-suite-ldf.js#readme",
   "contributors": [],
   "bin": {
     "rdf-test-suite-ldf": "bin/Runner.js"
