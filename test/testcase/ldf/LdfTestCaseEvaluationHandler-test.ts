@@ -447,13 +447,9 @@ describe('LdfTestCaseEvaluation', () => {
 
       const src1: Resource = new Resource({ term: blankNode(), context });
       src1.addProperty(pSource, new Resource({ term: literal('http://ex2.org'), context }));
-      src1.addProperty(pSourceType, pHDT);
-      const src2: Resource = new Resource({ term: blankNode(), context });
-      src2.addProperty(pSource, new Resource({ term: literal('http://ex2.org'), context }));
-      src2.addProperty(pSourceType, pUnknown);
+      src1.addProperty(pSourceType, pUnknown);
       const sources: Resource[] = [
         src1,
-        src2
       ];
       const dataSources = new Resource({ term: blankNode(), context });
       dataSources.list = sources;
