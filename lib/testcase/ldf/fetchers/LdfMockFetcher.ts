@@ -51,8 +51,10 @@ export class LdfMockFetcher {
    * @param mockFolderURI The URI of the folder containing the mocked testfiles
    * @param requestedURI The URI of the request the engine requests
    */
-  private static getMockedFileURI(mockFolderURI: string, requestedURI: string, acceptHeader: string) : string {
-    // TODO: Check if mockFolderURI doesn't yet have a trailing slash!
+  private static getMockedFileURI(mockFolderURI: string, requestedURI: string, acceptHeader: string): string {
+    if(mockFolderURI.endsWith('/')){
+      mockFolderURI = mockFolderURI.slice(0, mockFolderURI.length - 1);
+    }
     return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex') + this.getExtensionOnAcceptHeader(acceptHeader);
   }
 
@@ -60,13 +62,21 @@ export class LdfMockFetcher {
    * Depending on the Accept-header of the HTTP request we should find the files under another extension.
    * @param acceptHeader The request Accept-header value
    */
-  private static getExtensionOnAcceptHeader(acceptHeader: string) : string {
-    switch(acceptHeader){
+  private static getExtensionOnAcceptHeader(acceptHeader: string): string {
+    const acceptHeaders = acceptHeader.split(';');
+    for (let header of acceptHeaders) {
+      if (header.indexOf('q=') >= 0) {
+        header = header.split(',')[1];
+      }
+      switch (header) {
       case 'application/sparql-results+json':
         return '.srj';
-      default: // TODO: Implement this further, change TPF-recorder to .trig
-        return '.ttl';
+      case 'application/trig':
+      case 'application/trig,application/ld+json':
+        return '.trig';
+      }
     }
+    throw new Error(`The sourcetypes in the accept-header (${acceptHeader}) are not yet supported.`);
   }
 
   /**
@@ -74,14 +84,15 @@ export class LdfMockFetcher {
    * @param headers The header lines of the mocked testfile.
    * @returns a map with the header values.
    */
-  private static parseMockedFileHeaders(headers: string) : any {
-    let result: any = {};
-    for(let line of headers.split('\n')){
-      if(line.indexOf(':') < 0)
+  private static parseMockedFileHeaders(headers: string): any {
+    const result: any = {};
+    for (let line of headers.split('\n')) {
+      if (line.indexOf(':') < 0) {
         throw new Error(`Mocked testfile does not have valid header line: ${line}`);
-      line = line.substring(2,); // Remove '# '
-      let key = line.substring(0, line.indexOf(':')).trim(); // Parse key
-      let value = line.substring(line.indexOf(':') + 1).trim(); // Parse value
+      }
+      line = line.substring(2); // Remove '# '
+      const key = line.substring(0, line.indexOf(':')).trim(); // Parse key
+      const value = line.substring(line.indexOf(':') + 1).trim(); // Parse value
       result[key] = value; // Put in dictionary
     }
     return result;

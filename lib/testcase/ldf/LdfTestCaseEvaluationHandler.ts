@@ -109,7 +109,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
       throw new Error(reason);
     });
     const result: IQueryResult = await engine.query(this.queryString, { 
-      sources: sources,
+      sources,
       httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
     });
     // Tear down the mock-server for all sources
@@ -122,12 +122,12 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 
   ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
 
-  ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}     
-    
-  ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}    
-    
-  ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}     
-    
+  ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}
+
+  ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}
+
+  ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}
+
   ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
 `);
     }
