@@ -101,46 +101,51 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
-    // Set up mock-server, load all resources
-    this.responseMocker = await this.factory.getNewLdfResponseMocker();
-    this.responseMocker.loadSources(this.dataSources);
-    this.responseMocker.loadTest(this);
+    return new Promise(async (resolve, reject) => {
+      // Set up mock-server, load all resources
+      this.responseMocker = await this.factory.getNewLdfResponseMocker();
+      this.responseMocker.loadSources(this.dataSources);
+      this.responseMocker.loadTest(this);
 
-    await this.responseMocker.setUpServer();
-    logger.info(C.inColor(`Run test: ${this.uri}`, C.GREEN));
+      await this.responseMocker.setUpServer();
+      logger.info(C.inColor(`Run test: ${this.uri}`, C.GREEN));
 
-    // Query and retrieve result
-    const sources: ISource[] = await this.mapSources(this.dataSources).catch(async (reason: string) => {
-      await this.responseMocker.tearDownServer();
-      throw new Error(reason);
+      // Query and retrieve result
+      this.mapSources(this.dataSources)
+      .then(async (sources: ISource[]) => {
+        const result: IQueryResult = await engine.query(this.queryString, { 
+          sources,
+          httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
+        });
+  
+        // Tear down the mock-server for all sources
+        await this.responseMocker.tearDownServer();
+  
+        if(this.createdFolder){
+          fse.emptyDirSync(this.tmpFolder);
+        }
+  
+        if (! await this.queryResult.equals(result)) {
+          reject(new Error(`${C.inColor('Invalid query evaluation', C.RED)}
+        
+        ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
+        
+        ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}
+        
+        ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}
+        
+        ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}
+        
+        ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
+        `));
+        }
+        resolve();
+      })
+      .catch(async (reason: string) => {
+        await this.responseMocker.tearDownServer();
+        reject(new Error(reason));
+      });
     });
-
-    const result: IQueryResult = await engine.query(this.queryString, { 
-      sources,
-      httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
-    });
-
-    // Tear down the mock-server for all sources
-    await this.responseMocker.tearDownServer();
-
-    if(this.createdFolder){
-      fse.emptyDirSync(this.tmpFolder);
-    }
-
-    if (! await this.queryResult.equals(result)) {
-      throw new Error(`${C.inColor('Invalid query evaluation', C.RED)}
-
-  ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
-
-  ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}
-
-  ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}
-
-  ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}
-
-  ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
-`);
-    }
   }
 
   /**
@@ -185,7 +190,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             is.type = 'rdfjsSource';
             break;
           default:
-            throw new Error(`The sourcetype: ${source.type} is not known.`);
+            reject(new Error(`The sourcetype: ${source.type} is not known.`));
         }
         rtrn.push(source);
       }

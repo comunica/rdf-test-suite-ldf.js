@@ -327,7 +327,7 @@ describe('LdfTestCaseEvaluation', () => {
         resultSource: null,
       };
       const testcase = new LdfTestCaseEvaluation(testCaseData, props, factory);
-      return expect(testcase.test(engine, {})).rejects.toBeTruthy();
+      expect(testcase.test(engine, {})).rejects.toBeTruthy();
     });
   
   });
@@ -460,7 +460,7 @@ describe('LdfTestCaseEvaluation', () => {
 
       const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
-      expect(testCase.test(engine, {})).rejects.toThrowError();
+      expect(testCase.test(engine, {})).rejects.toBeTruthy();
     });
 
   });
