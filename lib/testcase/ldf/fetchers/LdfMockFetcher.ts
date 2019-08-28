@@ -8,16 +8,22 @@ import * as crypto from 'crypto';
  */
 export class LdfMockFetcher {
 
+  private test: LdfTestCaseEvaluation;
+
+  constructor(test: LdfTestCaseEvaluation) {
+    this.test = test;
+  }
+
   /**
    * Parse the mocked testfiles.
    * @param requestedURI The URI of the request the engine requests 
    * @param object The LdfTestCaseEvaluation we're testing 
    * @returns IMockedResponse representing the mocked testfiles
    */
-  public static parseMockedResponse(requestedURI: string, object: LdfTestCaseEvaluation, acceptHeader: string): Promise<IMockedResponse> {
+  public parseMockedResponse(requestedURI: string): Promise<IMockedResponse> {
     return new Promise((resolve, reject) => {
       let body = '';
-      const req: ClientRequest = https.request(this.getMockedFileURI(object.mockFolder, requestedURI, acceptHeader));
+      const req: ClientRequest = https.request(this.getMockedFileURI(this.test.mockFolder, requestedURI));
       req.on('response', (incoming: IncomingMessage) => {
         incoming.setEncoding('utf8');
         incoming.on('data', (chunk: any) => {
@@ -28,7 +34,7 @@ export class LdfMockFetcher {
         incoming.on('end', () => {
           // parse response and return 
           try {
-            let headers: any = this.parseMockedFileHeaders(body.split('\n').splice(0,3).join('\n'));
+            let headers: any = this.parseMockedFileHeaders(requestedURI, body.split('\n').splice(0,3).join('\n'));
             let response: IMockedResponse = {
               query: headers['Query'],
               iri: headers['Hashed IRI'],
@@ -51,32 +57,12 @@ export class LdfMockFetcher {
    * @param mockFolderURI The URI of the folder containing the mocked testfiles
    * @param requestedURI The URI of the request the engine requests
    */
-  private static getMockedFileURI(mockFolderURI: string, requestedURI: string, acceptHeader: string): string {
+  private getMockedFileURI(mockFolderURI: string, requestedURI: string): string {
     if(mockFolderURI.endsWith('/')){
+      // test the mockfolderURI on trailing slashes
       mockFolderURI = mockFolderURI.slice(0, mockFolderURI.length - 1);
     }
-    return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex') + this.getExtensionOnAcceptHeader(acceptHeader);
-  }
-
-  /**
-   * Depending on the Accept-header of the HTTP request we should find the files under another extension.
-   * @param acceptHeader The request Accept-header value
-   */
-  private static getExtensionOnAcceptHeader(acceptHeader: string): string {
-    const acceptHeaders = acceptHeader.split(';');
-    for (let header of acceptHeaders) {
-      if (header.indexOf('q=') >= 0) {
-        header = header.split(',')[1];
-      }
-      switch (header) {
-      case 'application/sparql-results+json':
-        return '.srj';
-      case 'application/trig':
-      case 'application/trig,application/ld+json':
-        return '.trig';
-      }
-    }
-    throw new Error(`The sourcetypes in the accept-header (${acceptHeader}) are not yet supported.`);
+    return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex');
   }
 
   /**
@@ -84,11 +70,11 @@ export class LdfMockFetcher {
    * @param headers The header lines of the mocked testfile.
    * @returns a map with the header values.
    */
-  private static parseMockedFileHeaders(headers: string): any {
+  private parseMockedFileHeaders(uri: string, headers: string): any {
     const result: any = {};
     for (let line of headers.split('\n')) {
       if (line.indexOf(':') < 0) {
-        throw new Error(`Mocked testfile does not have valid header line: ${line}`);
+        throw new Error(`Mocked testfile does not have valid header line: ${line} - ${uri}`);
       }
       line = line.substring(2); // Remove '# '
       const key = line.substring(0, line.indexOf(':')).trim(); // Parse key

@@ -1,25 +1,33 @@
 import * as net from 'net';
 import { LdfResponseMocker } from "../testcase/ldf/mock/LdfResponseMocker";
-
+// tslint:disable:no-var-requires
+const tcpPortUsed = require('tcp-port-used');
+// tslint:enable:no-var-requires
 export class LdfResponseMockerFactory {
 
   private currentPort: number;
 
   constructor(port?: number) {
+    // default port is 3000
     this.currentPort = port ? port : 3000;
   }
 
   /**
    * Return a LdfResponseMocker with the next open port
    */
-  public getNewLdfResponseMocker(): Promise<LdfResponseMocker> {
+  public async getNewLdfResponseMocker(): Promise<LdfResponseMocker> {
     return new Promise(async (resolve, reject) => {
-      while (this.isPort(this.currentPort) && ! await this.isPortAvailable(this.currentPort)) {
-        this.currentPort += 1;
+      try {
+        if (this.isPort(this.currentPort)) {
+          tcpPortUsed.waitUntilFree(this.currentPort, 500, 4000).then(() => {
+            resolve(new LdfResponseMocker(this.currentPort));
+          }, (err: Error) => {
+            reject(err);
+          });
+        }
+      } catch (err) {
+        reject(err);
       }
-      const mocker: LdfResponseMocker = new LdfResponseMocker(this.currentPort);
-      this.currentPort += 1;
-      resolve(mocker);
     });
   }
 
@@ -30,7 +38,7 @@ export class LdfResponseMockerFactory {
   private isPortAvailable(port: number): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       const tester: net.Server = net.createServer()
-        .once('error', (err: any) => (err.code === 'EADDRINUSE' ? resolve(false) : reject(true)))
+        .once('error', (err: any) => resolve(false))
         .once('listening', () => tester.once('close', () => resolve(true)).close())
         .listen(port);
     });
@@ -42,7 +50,7 @@ export class LdfResponseMockerFactory {
    */
   private isPort(port: number): boolean {
     if (! (1024 <= port && port <= 49151)) {
-      throw new Error('There are not enough ports for these tests. Please choose a lower starting port.');
+      throw new Error(`The given port: ${port} is invalid`);
     }
     return true;
   }

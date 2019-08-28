@@ -14,6 +14,7 @@ import { storeStream } from "rdf-store-stream";
 const rdfParser = require('rdf-parse').default;
 import * as C from '../../Colors';
 import * as Path from 'path';
+import { logger } from "../../factory/Logger";
 
 /**
  * Test case handler for https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#LdfQueryEvaluationTest.
@@ -52,7 +53,8 @@ export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTest
         resultSource: queryResponse,
         mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined
       },
-      factory
+      factory,
+      options
     );
   }
 
@@ -85,38 +87,46 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 
   private responseMocker: LdfResponseMocker;
   private readonly factory: LdfResponseMockerFactory;
-  private readonly portNr: number;
-  private readonly tmpHdtFolder: string;
+  private readonly tmpFolder: string;
+  private readonly options?: IFetchOptions;
   private createdFolder: boolean;
 
-  constructor(testCaseData: ITestCaseData, props: ILdfTestCaseEvaluationProps, factory: LdfResponseMockerFactory){
+  constructor(testCaseData: ITestCaseData, props: ILdfTestCaseEvaluationProps, factory: LdfResponseMockerFactory, options?: IFetchOptions){
     Object.assign(this, testCaseData);
     Object.assign(this, props);
     this.factory = factory;
-    this.tmpHdtFolder = 'tmpHdt';
+    this.tmpFolder = options ? options.cachePath : 'tmpfolder';
+    this.options = options;
     this.createdFolder = false;
   }
 
   public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
     // Set up mock-server, load all resources
     this.responseMocker = await this.factory.getNewLdfResponseMocker();
-    this.responseMocker.loadTest(this.dataSources);
-    await this.responseMocker.setUpServer(this);
+    this.responseMocker.loadSources(this.dataSources);
+    this.responseMocker.loadTest(this);
+
+    await this.responseMocker.setUpServer();
+    logger.info(C.inColor(`Run test: ${this.uri}`, C.GREEN));
 
     // Query and retrieve result
-    const sources: ISource[] | void = await this.mapSources(this.dataSources).catch((reason: string) => {
-      this.responseMocker.tearDownServer();
+    const sources: ISource[] = await this.mapSources(this.dataSources).catch(async (reason: string) => {
+      await this.responseMocker.tearDownServer();
       throw new Error(reason);
     });
+
     const result: IQueryResult = await engine.query(this.queryString, { 
       sources,
       httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
     });
+
     // Tear down the mock-server for all sources
-    this.responseMocker.tearDownServer();
+    await this.responseMocker.tearDownServer();
+
     if(this.createdFolder){
-      fse.emptyDirSync(this.tmpHdtFolder);
+      fse.emptyDirSync(this.tmpFolder);
     }
+
     if (! await this.queryResult.equals(result)) {
       throw new Error(`${C.inColor('Invalid query evaluation', C.RED)}
 
@@ -153,28 +163,29 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             is.type = 'sparql';
             break;
           case 'HDT':
-            fse.ensureDirSync(this.tmpHdtFolder);
-            let hdtFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
+            fse.ensureDirSync(this.tmpFolder);
+            
+            let hdtFile: string = await LdfUtil.fetchFile(this.tmpFolder, source);
 
-            this.createdFolder = true;
+            if(! this.options) this.createdFolder = true;
 
             is.type = 'hdtFile';
-            is.value = Path.join(process.cwd(), this.tmpHdtFolder, hdtFile);
+            is.value = Path.join(process.cwd(), this.tmpFolder, hdtFile);
             break;
           case 'RDFJS':
-            fse.ensureDirSync(this.tmpHdtFolder);
+            fse.ensureDirSync(this.tmpFolder);
 
-            let rdfjsFile: string = await LdfUtil.fetchFile(this.tmpHdtFolder, source);
-            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(process.cwd(), this.tmpHdtFolder, rdfjsFile));        
+            let rdfjsFile: string = await LdfUtil.fetchFile(this.tmpFolder, source);
+            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(process.cwd(), this.tmpFolder, rdfjsFile));        
             const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
             
-            this.createdFolder = true;
+            if(! this.options) this.createdFolder = true;
 
             is.value = await storeStream(quadStream);
             is.type = 'rdfjsSource';
             break;
           default:
-            reject(`The sourcetype: ${source.type} is not known.`);
+            throw new Error(`The sourcetype: ${source.type} is not known.`);
         }
         rtrn.push(source);
       }

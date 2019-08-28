@@ -23,7 +23,6 @@ import { LdfResponseMockerFactory } from "../../../../lib/factory/LdfResponseMoc
     break;
   default:
     return Promise.reject(new Error('Fetch error'));
-    break;
   }
   return Promise.resolve(new Response(body, <any> { headers, status: 200, url }));
 };
@@ -105,7 +104,8 @@ describe('LdfResponseMocker', () => {
 
       const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
-      await mocker.setUpServer(testCase);
+      await mocker.setUpServer();
+      mocker.loadTest(testCase);
 
       const result: IQueryResult = await engine.query(this.queryString, { 
         sources: this.querySources,
@@ -147,10 +147,12 @@ describe('LdfResponseMocker', () => {
       const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
       expect(mocker.isWhiteListed(undefined)).toBeFalsy();
-      mocker.loadTest(testCase.dataSources);
+      mocker.loadTest(testCase);
+      mocker.loadSources(testCase.dataSources);
 
       expect(mocker.isWhiteListed('https://ex2.org')).toBeTruthy();
       expect(mocker.isWhiteListed('https://ex3.org')).toBeFalsy();
+
       mocker.tearDownServer();
       mocker.tearDownServer();
     });

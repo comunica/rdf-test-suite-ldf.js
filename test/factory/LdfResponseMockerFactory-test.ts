@@ -1,5 +1,4 @@
 import { LdfResponseMockerFactory } from "../../lib/factory/LdfResponseMockerFactory";
-import { LdfTestCaseEvaluation } from "../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import { LdfResponseMocker } from "../../lib/testcase/ldf/mock/LdfResponseMocker";
 
 describe('LdfResponseMockerFactory', () => {
@@ -14,18 +13,23 @@ describe('LdfResponseMockerFactory', () => {
 
     });
 
-    it('should use the next port when the port is in use', async () => {
+    it('should error when the port is in use', async () => {
 
-      const factory1: LdfResponseMockerFactory = new LdfResponseMockerFactory();
-      const factory2: LdfResponseMockerFactory = new LdfResponseMockerFactory();
+      const factory1: LdfResponseMockerFactory = new LdfResponseMockerFactory(7777);
+      const factory2: LdfResponseMockerFactory = new LdfResponseMockerFactory(7777);
 
       const mocker1: LdfResponseMocker = await factory1.getNewLdfResponseMocker();
-      await mocker1.setUpServer(new LdfTestCaseEvaluation(undefined, undefined, undefined));
-      const mocker2: LdfResponseMocker = await factory2.getNewLdfResponseMocker();
+      await mocker1.setUpServer();
 
-      mocker1.tearDownServer();
-      mocker2.tearDownServer();
-      expect(mocker2.proxyAddress !== mocker1.proxyAddress).toBeTruthy();
+      await expect(factory2.getNewLdfResponseMocker()).rejects.toBeTruthy();
+      await mocker1.tearDownServer();
+    });
+
+    it('should error when the port is invalid', async () => {
+
+      const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(-1000);
+      await expect(factory.getNewLdfResponseMocker()).rejects.toBeTruthy();
+
     });
 
   });

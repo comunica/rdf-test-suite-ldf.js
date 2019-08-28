@@ -62,8 +62,7 @@ export async function ldfTestCaseFromResource(factory: LdfResponseMockerFactory,
   }
 
   try {
-    return await handler.resourceToLdfTestCase(resource, factory, baseTestCase, options);;
-    // return await handler.resourceToLdfTestCase(resource, mock, baseTestCase, options);
+    return await handler.resourceToLdfTestCase(resource, factory, baseTestCase, options);
   } catch (e) {
     // tslint:disable-next-line:no-console
     console.error(e.toString());

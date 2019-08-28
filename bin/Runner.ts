@@ -6,6 +6,7 @@ import * as Path from "path";
 import {ITestResult, ITestSuiteConfig, TestSuiteRunner} from "rdf-test-suite";
 import { LdfTestSuiteRunner, ILdfTestSuiteConfig } from "../lib/LdfTestSuiteRunner";
 import * as C from '../lib/Colors';
+import { logger } from "../lib/factory/Logger";
 
 const args = minimist(process.argv.slice(2));
 
@@ -28,9 +29,9 @@ ${C.inColor('Options:', C.YELLOW)}
   -e    always exit with status code 0 on test errors
   -t    regex for test IRIs to run
   -i    JSON string with custom options that need to be passed to the engine
-  -d    time out duration for test cases (in milliseconds, default 5000)
+  -d    time out duration for test cases (in milliseconds, default 30000)
   -m    URL to local path mapping (e.g. 'https://w3c.github.io/json-ld-api/|/path/to/folder/')
-  -r    The port number on which the mocking servers will start spawning (3000 by default)
+  -r    The port number on which the mocking servers will start spawning (10000 by default)
 `);
   process.exit(1);
 }
@@ -39,6 +40,7 @@ ${C.inColor('Options:', C.YELLOW)}
 let cachePath: string = null;
 if (args.c) {
   cachePath = Path.join(process.cwd(), (args.c === true ? '.rdf-test-suite-cache/' : args.c));
+  logger.info(`Caching enabled in ${cachePath}`);
   if (!existsSync(cachePath)) {
     mkdirSync(cachePath);
   }
@@ -50,7 +52,7 @@ const engine = require(Path.join(process.cwd(), args._[0]));
 const defaultConfig = {
   exitWithStatusCode0: false,
   outputFormat: 'detailed',
-  timeOutDuration: 5000, 
+  timeOutDuration: 30000, 
   // A higher timeOutDuration than the original rdf-test-suite because of more overhead w/ mock servers
 };
 

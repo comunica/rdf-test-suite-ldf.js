@@ -3,6 +3,7 @@ import { LdfManifestLoader } from "./LdfManifestLoader";
 import WriteStream = NodeJS.WriteStream;
 import * as LogSymbols from "log-symbols";
 import * as C from "./Colors";
+import { logger } from "./factory/Logger";
 
 /**
  * The LdfTestSuiteRunner runs ldf-query-engine test manifests.
@@ -34,6 +35,7 @@ export class LdfTestSuiteRunner extends TestSuiteRunner {
       return results;
     }
 
+    logger.info('Running manifest');
     await this.runManifestConcrete(manifest, handler, config, results);
     return results;
   }
