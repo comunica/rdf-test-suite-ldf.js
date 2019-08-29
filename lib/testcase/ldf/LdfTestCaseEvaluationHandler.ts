@@ -95,7 +95,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     Object.assign(this, testCaseData);
     Object.assign(this, props);
     this.factory = factory;
-    this.tmpFolder = options ? options.cachePath : 'tmpfolder';
+    this.tmpFolder = options && options.cachePath ? options.cachePath  : 'tmpfolder';
     this.options = options;
     this.createdFolder = false;
   }
@@ -172,7 +172,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             
             let hdtFile: string = await LdfUtil.fetchFile(this.tmpFolder, source);
 
-            if(! this.options) this.createdFolder = true;
+            if(! this.options || ! this.options.cachePath) this.createdFolder = true;
 
             is.type = 'hdtFile';
             is.value = Path.join(process.cwd(), this.tmpFolder, hdtFile);
@@ -184,7 +184,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(process.cwd(), this.tmpFolder, rdfjsFile));        
             const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
             
-            if(! this.options) this.createdFolder = true;
+            if(! this.options || ! this.options.cachePath) this.createdFolder = true;
 
             is.value = await storeStream(quadStream);
             is.type = 'rdfjsSource';
