@@ -41,8 +41,10 @@ export class LdfResponseMocker {
         if(this.isWhiteListed(query.split('/').slice(0, 3).join('/'))){
           // This response should not be mocked
           let options = {
-            headers: args.headers
-          }
+            headers: {
+              accept: request.headers.accept
+            }
+          };
 
           let client = LdfUtil.getHttpSClient(query.split('/')[0]);
 
