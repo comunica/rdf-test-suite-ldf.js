@@ -39,6 +39,10 @@ ${C.inColor('Options:', C.YELLOW)}
 // Enable caching if needed
 let cachePath: string = null;
 if (args.c) {
+  if(! args.c.endsWith('/')){
+    console.error(C.inColor(`Please give a correct caching path. The path '${args.c}' is invalid. Did you forget a trailing slash?`, C.YELLOW));
+    process.exit(1);
+  }
   cachePath = Path.join(process.cwd(), (args.c === true ? '.rdf-test-suite-cache/' : args.c));
   logger.info(`Caching enabled in ${cachePath}`);
   if (!existsSync(cachePath)) {

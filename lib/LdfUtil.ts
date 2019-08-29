@@ -43,7 +43,7 @@ export class LdfUtil {
       let iri: string = source.value;
       // we want to re-use the current filename for the temp file
       let filename: string = iri.split('/').slice(-1)[0];
-      const file = fs.createWriteStream(Path.join(process.cwd(), folder, filename));
+      const file = fs.createWriteStream(Path.join(folder, filename));
       
       this.getHttpSClient(iri.split('/')[0]).get(iri, (response: any) => {
         response.on('data', (data: any) => {

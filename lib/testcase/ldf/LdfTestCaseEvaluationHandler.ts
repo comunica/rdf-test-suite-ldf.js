@@ -95,7 +95,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     Object.assign(this, testCaseData);
     Object.assign(this, props);
     this.factory = factory;
-    this.tmpFolder = options && options.cachePath ? options.cachePath  : 'tmpfolder';
+    this.tmpFolder = (options && options.cachePath) ? options.cachePath  : Path.join(process.cwd(), 'tmpfolder');
     this.options = options;
     this.createdFolder = false;
   }
@@ -169,19 +169,25 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             break;
           case 'HDT':
             fse.ensureDirSync(this.tmpFolder);
-            
-            let hdtFile: string = await LdfUtil.fetchFile(this.tmpFolder, source);
 
+            let hdtFile: string = source.value.split('/').slice(-1)[0];
+            
+            if(! fse.existsSync(hdtFile)){
+              await LdfUtil.fetchFile(this.tmpFolder, source);
+            }
             if(! this.options || ! this.options.cachePath) this.createdFolder = true;
 
             is.type = 'hdtFile';
-            is.value = Path.join(process.cwd(), this.tmpFolder, hdtFile);
+            is.value = Path.join(this.tmpFolder, hdtFile);
             break;
           case 'RDFJS':
             fse.ensureDirSync(this.tmpFolder);
 
-            let rdfjsFile: string = await LdfUtil.fetchFile(this.tmpFolder, source);
-            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(process.cwd(), this.tmpFolder, rdfjsFile));        
+            let rdfjsFile: string = source.value.split('/').slice(-1)[0];
+            if(! fse.existsSync(rdfjsFile)){
+              await LdfUtil.fetchFile(this.tmpFolder, source);
+            }
+            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(this.tmpFolder, rdfjsFile));        
             const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
             
             if(! this.options || ! this.options.cachePath) this.createdFolder = true;
