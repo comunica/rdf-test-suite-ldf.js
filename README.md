@@ -50,7 +50,7 @@ $ rdf-test-suite-ldf myengine.js https://comunica.github.io/manifest-ldf-tests/s
 
 ### Extra details on HTTP caching
 
-The `-c` flag inherited from [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) does also work in `rdf-test-suite-ldf`. For HDT- and RDFJS-testing files should and will be (temporarily) stored in local memory. These files will be deleted by default but when the `-c` flag is given, all those files will be stored in the directory given with this flag. These files can be used the next time to avoid re-fetching files from servers.
+The `-c` flag inherited from [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) does also work in `rdf-test-suite-ldf`, especially for HDT- and RDFJS-testing. All the files for HDT- and RDFJS-testing should and will be (temporarily) stored in the given local cache folder. These files are deleted by default but when the `-c` flag is given, all those files will be stored in the directory given with this flag. These files can be used the next time to avoid re-fetching files from servers.
 
 ```bash
 $ rdf-test-suite-ldf myengine.js https://comunica.github.io/manifest-ldf-tests/sparql/sparql-manifest.ttl -c path/to/dir
@@ -62,7 +62,7 @@ A list of extra options, inherited from [rdf-test-suite.js](https://github.com/r
 
 ## Some default test suites
 
-I will create and publish some test-suites for the 4 engines of [comunica](https://github.com/comunica/comunica) which can be found [here](https://comunica.github.io/manifest-ldf-tests/).
+I created and published some test-suites for the 4 engines of [comunica](https://github.com/comunica/comunica) which can be found [here](https://comunica.github.io/manifest-ldf-tests/).
 
 ## License
 
