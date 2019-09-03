@@ -29,9 +29,7 @@ export class LdfResponseMocker {
   /**
    * Temporarily set up a mocked server which will serve the mocked responses
    * to the tested engine.
-   * @param object The LdfTestCaseEvaluation we will be evaluating
    */
-  /* istanbul ignore next */
   public async setUpServer(): Promise<void> {
     return new Promise(async (resolve, reject) => {
       this.dummyServer = await http.createServer().listen(this.port);
