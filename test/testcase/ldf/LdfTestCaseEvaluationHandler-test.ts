@@ -1,18 +1,18 @@
-import {  blankNode, literal, namedNode } from "@rdfjs/data-model";
+import {blankNode, literal, namedNode} from "@rdfjs/data-model";
 import "jest-rdf";
+import {ContextParser} from "jsonld-context-parser";
+import {Resource} from "rdf-object";
+import * as quad from 'rdf-quad';
+import {ITestCaseData, QueryResultQuads} from "rdf-test-suite";
+import * as streamifyString from 'streamify-string';
+import {LdfResponseMockerFactory} from "../../../lib/factory/LdfResponseMockerFactory";
+import {ISource} from "../../../lib/testcase/ldf/IDataSource";
+import {ILdfQueryEngine} from "../../../lib/testcase/ldf/ILdfQueryEngine";
 import {
   ILdfTestCaseEvaluationProps,
   LdfTestCaseEvaluation,
   LdfTestCaseEvaluationHandler,
 } from "../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
-import * as quad from 'rdf-quad';
-import { ContextParser } from "jsonld-context-parser";
-import { Resource } from "rdf-object";
-import { QueryResultQuads, ITestCaseData } from "rdf-test-suite";
-import * as streamifyString from 'streamify-string';
-import { LdfResponseMockerFactory } from "../../../lib/factory/LdfResponseMockerFactory";
-import {ISource} from "../../../lib/testcase/ldf/IDataSource";
-import {ILdfQueryEngine} from "../../../lib/testcase/ldf/ILdfQueryEngine";
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {
@@ -63,6 +63,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
   let pMockFolder;
 
   beforeEach((done) => {
+    // tslint:disable:max-line-length
     new ContextParser().parse(require('../../../lib/context-manifest.json'))
       .then((parsedContext) => {
         context = parsedContext;
@@ -85,6 +86,7 @@ describe('TestCaseLdfQueryEvaluation', () => {
           { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
         done();
       });
+    // tslint:enable:max-line-length
   });
 
   describe('#resourceToTestCase', () => {
@@ -256,6 +258,7 @@ describe('LdfTestCaseEvaluation', () => {
   let pMockFolder;
 
   beforeEach((done) => {
+    // tslint:disable:max-line-length
     new ContextParser().parse(require('../../../lib/context-manifest.json'))
       .then((parsedContext) => {
         context = parsedContext;
@@ -275,7 +278,7 @@ describe('LdfTestCaseEvaluation', () => {
         pHDT = new Resource(
           { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#HDT'), context });
         pRDFJS = new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#RDFJS') })
+          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#RDFJS') });
         pUnknown = new Resource(
           { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#Unknown'), context });
         pDataSources = new Resource(
@@ -286,6 +289,7 @@ describe('LdfTestCaseEvaluation', () => {
           { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
         done();
       });
+    // tslint:enable:max-line-length
   });
 
   describe('#constructor', () => {

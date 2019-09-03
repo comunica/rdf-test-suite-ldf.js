@@ -1,7 +1,8 @@
-import { ITestCaseHandler, ITestCase, IFetchOptions, IManifest, testCaseFromResource, manifestFromResource, manifestFromSpecificationResource, Util } from "rdf-test-suite";
 import { Resource } from "rdf-object";
-import { ldfTestCaseFromResource } from "./testcase/ldf/ILdfTestCase";
+import { IFetchOptions, IManifest, ITestCase, ITestCaseHandler,
+  manifestFromSpecificationResource, Util } from "rdf-test-suite";
 import { LdfResponseMockerFactory } from "./factory/LdfResponseMockerFactory";
+import { ldfTestCaseFromResource } from "./testcase/ldf/ILdfTestCase";
 
 /**
  * Create a manifest object from a resource.
@@ -11,7 +12,8 @@ import { LdfResponseMockerFactory } from "./factory/LdfResponseMockerFactory";
  * @return {Promise<IManifest>} A promise resolving to a manifest object.
  */
 export async function ldfManifestFromResource(testCaseHandlers: {[uri: string]: ITestCaseHandler<ITestCase<any>>},
-                                              options: IFetchOptions, resource: Resource, startPort?: number): Promise<IManifest> {
+                                              options: IFetchOptions, resource: Resource, startPort?: number):
+  Promise<IManifest> {
   // The factory will allow each ITestCase to setup a mocking server if needed
   let factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(startPort);
   let res: IManifest = {
@@ -28,7 +30,8 @@ export async function ldfManifestFromResource(testCaseHandlers: {[uri: string]: 
         .map(ldfManifestFromResource.bind(null, factory, testCaseHandlers, options))))),
     testEntries: (await Promise.all<ITestCase<any>>([].concat.apply([],
       resource.properties.entries.map(
-        (entryList: Resource) => entryList.list.map(ldfTestCaseFromResource.bind(null, factory, testCaseHandlers, options))))))
+        (entryList: Resource) => entryList.list
+          .map(ldfTestCaseFromResource.bind(null, factory, testCaseHandlers, options))))))
           .filter((v) => v),
     uri: resource.value,
   };

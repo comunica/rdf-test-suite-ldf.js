@@ -1,9 +1,9 @@
-import { TestSuiteRunner, IManifest, ITestResult, ITestSuiteConfig } from "rdf-test-suite";
-import { LdfManifestLoader } from "./LdfManifestLoader";
 import WriteStream = NodeJS.WriteStream;
 import * as LogSymbols from "log-symbols";
+import { IManifest, ITestResult, TestSuiteRunner } from "rdf-test-suite";
 import * as C from "./Colors";
 import { logger } from "./factory/Logger";
+import { LdfManifestLoader } from "./LdfManifestLoader";
 
 /**
  * The LdfTestSuiteRunner runs ldf-query-engine test manifests.
@@ -23,7 +23,8 @@ export class LdfTestSuiteRunner extends TestSuiteRunner {
   public async runManifest(manifestUrl: string, handler: any, config: ILdfTestSuiteConfig): Promise<ITestResult[]> {
     const { cachePath, specification, urlToFileMapping, startPort } = config;
     const urlToFileMappings = this.fromUrlToMappingString(urlToFileMapping);
-    const manifest: IManifest = await new LdfManifestLoader().from(manifestUrl, { cachePath, urlToFileMappings }, startPort);
+    const manifest: IManifest = await new LdfManifestLoader()
+      .from(manifestUrl, { cachePath, urlToFileMappings }, startPort);
     const results: ITestResult[] = [];
 
     // Only run the tests for the given specification if one was defined.
@@ -40,7 +41,7 @@ export class LdfTestSuiteRunner extends TestSuiteRunner {
     return results;
   }
 
-    /**
+  /**
    * Print the given test results to a text stream.
    * @param {WriteStream} stdout The output stream to write to.
    * @param {ITestResult[]} results An array of test results.
@@ -84,7 +85,6 @@ ${LogSymbols.error} ${C.inColor(result.test.name, C.RED)}
       stdout.write(`${LogSymbols.error} ${success} / ${results.length} tests succeeded!${skippedString}\n`);
     }
   }
-
 
 }
 

@@ -1,38 +1,47 @@
-import { IQueryResult, TestCaseQueryEvaluationHandler, IFetchOptions, Util, IFetchResponse, ITestCaseData } from "rdf-test-suite";
-import { Resource } from "rdf-object";
-import { ILdfTestCase } from "./ILdfTestCase";
-import { ILdfQueryEngine } from "./ILdfQueryEngine";
-import { LdfResponseMocker } from "./mock/LdfResponseMocker";
-import * as stringifyStream from 'stream-to-string';
-import { ProxyHandlerStatic } from '@comunica/actor-http-proxy';
 import * as fse from 'fs-extra';
-import { IDataSource, ISource } from "./IDataSource";
-import { LdfUtil } from "../../LdfUtil";
-import { ILdfTestCaseHandler } from "./ILdfTestCaseHandler";
-import { LdfResponseMockerFactory } from "../../factory/LdfResponseMockerFactory";
-import { storeStream } from "rdf-store-stream";
-const rdfParser = require('rdf-parse').default;
-import * as C from '../../Colors';
 import * as Path from 'path';
-import { logger } from "../../factory/Logger";
+import {Resource} from "rdf-object";
+import rdfParser from "rdf-parse";
+import {storeStream} from "rdf-store-stream";
+import {
+  IFetchOptions,
+  IFetchResponse,
+  IQueryResult,
+  ITestCaseData,
+  TestCaseQueryEvaluationHandler,
+  Util,
+} from "rdf-test-suite";
+import * as stringifyStream from 'stream-to-string';
+import * as C from '../../Colors';
+import {LdfResponseMockerFactory} from "../../factory/LdfResponseMockerFactory";
+import {logger} from "../../factory/Logger";
+import {LdfUtil} from "../../LdfUtil";
+import {IDataSource, ISource} from "./IDataSource";
+import {ILdfQueryEngine} from "./ILdfQueryEngine";
+import {ILdfTestCase} from "./ILdfTestCase";
+import {ILdfTestCaseHandler} from "./ILdfTestCaseHandler";
+import {LdfResponseMocker} from "./mock/LdfResponseMocker";
 
 /**
- * Test case handler for https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#LdfQueryEvaluationTest.
+ * Test case handler for
+ * https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#LdfQueryEvaluationTest.
  */
 export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTestCaseEvaluation> {
 
-  public async resourceToLdfTestCase(resource: Resource, factory: LdfResponseMockerFactory, testCaseData: ITestCaseData, options?: IFetchOptions): Promise<LdfTestCaseEvaluation> {
-    if(!resource.property.action) {
+  public async resourceToLdfTestCase(resource: Resource, factory: LdfResponseMockerFactory,
+                                     testCaseData: ITestCaseData, options?: IFetchOptions):
+    Promise<LdfTestCaseEvaluation> {
+    if (!resource.property.action) {
       throw new Error(`Missing mf:action in ${resource}`);
     }
-    if(!resource.property.result) {
+    if (!resource.property.result) {
       throw new Error(`Missing mf:result in ${resource}`);
     }
-    if(!resource.property.dataSources || resource.property.dataSources.list.length <= 0){
+    if (!resource.property.dataSources || resource.property.dataSources.list.length <= 0) {
       throw new Error(`Missing et:dataSources in ${resource}`);
     }
     const action = resource.property.action;
-    if(!action.property.query){
+    if (!action.property.query) {
       throw new Error(`Missing qt:query in mf:action of ${resource}`);
     }
 
@@ -41,20 +50,20 @@ export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTest
       testCaseData,
       {
         baseIRI: Util.normalizeBaseUrl(action.property.query.value),
-        queryString: await stringifyStream((await Util.fetchCached(action.property.query.value, options)).body),
         dataSources: await Promise.all<IDataSource>([].concat.apply([],
           resource.properties.dataSources.map((entrySources: Resource) => entrySources.list.map(
-          (entry: Resource) => {
-            return {'value': entry.property.source.value, 'type': entry.property.sourceType.value };
-          })))),
+            (entry: Resource) => {
+              return { value: entry.property.source.value, type: entry.property.sourceType.value };
+            })))),
+        mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined,
         queryResult: await TestCaseQueryEvaluationHandler.parseQueryResult(
           Util.identifyContentType(queryResponse.url, queryResponse.headers),
           queryResponse.url, queryResponse.body),
+        queryString: await stringifyStream((await Util.fetchCached(action.property.query.value, options)).body),
         resultSource: queryResponse,
-        mockFolder: action.property.mockFolder ? action.property.mockFolder.value : undefined
       },
       factory,
-      options
+      options,
     );
   }
 
@@ -91,7 +100,8 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   private readonly options?: IFetchOptions;
   private createdFolder: boolean;
 
-  constructor(testCaseData: ITestCaseData, props: ILdfTestCaseEvaluationProps, factory: LdfResponseMockerFactory, options?: IFetchOptions){
+  constructor(testCaseData: ITestCaseData, props: ILdfTestCaseEvaluationProps,
+              factory: LdfResponseMockerFactory, options?: IFetchOptions) {
     Object.assign(this, testCaseData);
     Object.assign(this, props);
     this.factory = factory;
@@ -121,21 +131,21 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
         // Tear down the mock-server for all sources
         await this.responseMocker.tearDownServer();
 
-        if(this.createdFolder){
+        if (this.createdFolder) {
           fse.emptyDirSync(this.tmpFolder);
         }
 
         if (! await this.queryResult.equals(result)) {
           reject(new Error(`${C.inColor('Invalid query evaluation', C.RED)}
-        
+
         ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
-        
+
         ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}
-        
+
         ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}
-        
+
         ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}
-        
+
         ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
         `));
         }
@@ -152,51 +162,55 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
    * Map the manifest-sourceTypes to the sourcetypes the engine uses (based on comunica-engines).
    * @param sources The sources from the manifest file
    */
-  private mapSources(sources: IDataSource[]) : Promise<ISource[]> {
+  private mapSources(sources: IDataSource[]): Promise<ISource[]> {
     return new Promise(async (resolve, reject) => {
-      let rtrn: ISource[] = [];
-      for(let source of sources){
-        let is : ISource = source;
-        switch(source.type.split('#')[1]){
-          case 'TPF':
-            is.type = '';
-            break;
-          case 'File':
-            is.type = 'file';
-            break;
-          case 'SPARQL':
-            is.type = 'sparql';
-            break;
-          case 'HDT':
-            fse.ensureDirSync(this.tmpFolder);
+      const rtrn: ISource[] = [];
+      for (const source of sources) {
+        const is: ISource = source;
+        switch (source.type.split('#')[1]) {
+        case 'TPF':
+          is.type = '';
+          break;
+        case 'File':
+          is.type = 'file';
+          break;
+        case 'SPARQL':
+          is.type = 'sparql';
+          break;
+        case 'HDT':
+          fse.ensureDirSync(this.tmpFolder);
 
-            let hdtFile: string = source.value.split('/').slice(-1)[0];
+          const hdtFile: string = source.value.split('/').slice(-1)[0];
 
-            if(! fse.existsSync(hdtFile)){
-              await LdfUtil.fetchFile(this.tmpFolder, source);
-            }
-            if(! this.options || ! this.options.cachePath) this.createdFolder = true;
+          if (!fse.existsSync(hdtFile)) {
+            await LdfUtil.fetchFile(this.tmpFolder, source);
+          }
+          if (! this.options || ! this.options.cachePath) {
+            this.createdFolder = true;
+          }
 
-            is.type = 'hdtFile';
-            is.value = Path.join(this.tmpFolder, hdtFile);
-            break;
-          case 'RDFJS':
-            fse.ensureDirSync(this.tmpFolder);
+          is.type = 'hdtFile';
+          is.value = Path.join(this.tmpFolder, hdtFile);
+          break;
+        case 'RDFJS':
+          fse.ensureDirSync(this.tmpFolder);
 
-            let rdfjsFile: string = source.value.split('/').slice(-1)[0];
-            if(! fse.existsSync(rdfjsFile)){
-              await LdfUtil.fetchFile(this.tmpFolder, source);
-            }
-            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(this.tmpFolder, rdfjsFile));
-            const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
+          const rdfjsFile: string = source.value.split('/').slice(-1)[0];
+          if (!fse.existsSync(rdfjsFile)) {
+            await LdfUtil.fetchFile(this.tmpFolder, source);
+          }
+          const stream: NodeJS.ReadableStream = fse.createReadStream(Path.join(this.tmpFolder, rdfjsFile));
+          const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
 
-            if(! this.options || ! this.options.cachePath) this.createdFolder = true;
+          if (!this.options || ! this.options.cachePath) {
+            this.createdFolder = true;
+          }
 
-            is.value = await storeStream(quadStream);
-            is.type = 'rdfjsSource';
-            break;
-          default:
-            reject(new Error(`The sourcetype: ${source.type} is not known.`));
+          is.value = await storeStream(quadStream);
+          is.type = 'rdfjsSource';
+          break;
+        default:
+          reject(new Error(`The sourcetype: ${source.type} is not known.`));
         }
         rtrn.push(source);
       }

@@ -1,5 +1,4 @@
-import { N3Store } from "n3";
-import { Store, Quad } from "rdf-js";
+import { Quad, Store } from "rdf-js";
 
 /**
  * Interface representing one datasource of a test
@@ -17,4 +16,3 @@ export interface ISource  {
   value: string | Store<Quad>;
   type: string;
 }
-

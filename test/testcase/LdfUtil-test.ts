@@ -1,9 +1,7 @@
-import * as fs from 'fs';
 import * as fse from "fs-extra";
 import * as nock from 'nock';
 import * as Path from 'path';
-import { Util } from "rdf-test-suite";
-import { LdfUtil } from "../../lib/LdfUtil";
+import {LdfUtil} from "../../lib/LdfUtil";
 
 describe('LdfUtil', () => {
   const fileUrl = "https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File";

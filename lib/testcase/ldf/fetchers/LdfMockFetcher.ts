@@ -1,7 +1,7 @@
-import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
+import * as crypto from 'crypto';
 import { ClientRequest, IncomingMessage } from "http";
 import * as https from 'https';
-import * as crypto from 'crypto';
+import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
 
 /**
  * Class that fetches the mocked testfiles.
@@ -16,8 +16,8 @@ export class LdfMockFetcher {
 
   /**
    * Parse the mocked testfiles.
-   * @param requestedURI The URI of the request the engine requests 
-   * @param object The LdfTestCaseEvaluation we're testing 
+   * @param requestedURI The URI of the request the engine requests
+   * @param object The LdfTestCaseEvaluation we're testing
    * @returns IMockedResponse representing the mocked testfiles
    */
   public parseMockedResponse(requestedURI: string): Promise<IMockedResponse> {
@@ -27,22 +27,23 @@ export class LdfMockFetcher {
       req.on('response', (incoming: IncomingMessage) => {
         incoming.setEncoding('utf8');
         incoming.on('data', (chunk: any) => {
-          if(typeof chunk !== 'string')
+          if (typeof chunk !== 'string') {
             throw new Error(`Content of request should be string: ${chunk}`);
+          }
           body += chunk;
         });
         incoming.on('end', () => {
-          // parse response and return 
+          // parse response and return
           try {
-            let headers: any = this.parseMockedFileHeaders(requestedURI, body.split('\n').splice(0,3).join('\n'));
-            let response: IMockedResponse = {
-              query: headers['Query'],
-              iri: headers['Hashed IRI'],
+            const headers: any = this.parseMockedFileHeaders(requestedURI, body.split('\n').splice(0, 3).join('\n'));
+            const response: IMockedResponse = {
+              body: body.split('\n').splice(3).join('\n'),
               contentType: headers['Content-type'],
-              body: body.split('\n').splice(3,).join('\n'),
+              iri: headers['Hashed IRI'],
+              query: headers.Query,
             };
             resolve(response);
-          } catch(err) {
+          } catch (err) {
             reject(err);
           }
         });
@@ -58,7 +59,7 @@ export class LdfMockFetcher {
    * @param requestedURI The URI of the request the engine requests
    */
   private getMockedFileURI(mockFolderURI: string, requestedURI: string): string {
-    if(mockFolderURI.endsWith('/')){
+    if (mockFolderURI.endsWith('/')) {
       // test the mockfolderURI on trailing slashes
       mockFolderURI = mockFolderURI.slice(0, mockFolderURI.length - 1);
     }

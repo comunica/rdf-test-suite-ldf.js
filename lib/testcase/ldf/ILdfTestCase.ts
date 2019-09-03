@@ -1,9 +1,9 @@
-import { ILdfQueryEngine } from "./ILdfQueryEngine";
-import { IFetchOptions, ITestCaseData, ITestCase } from "rdf-test-suite";
 import { Resource } from "rdf-object";
 import { termToString} from "rdf-string";
-import { ILdfTestCaseHandler } from "./ILdfTestCaseHandler";
+import { IFetchOptions, ITestCase, ITestCaseData } from "rdf-test-suite";
 import { LdfResponseMockerFactory } from "../../factory/LdfResponseMockerFactory";
+import { ILdfQueryEngine } from "./ILdfQueryEngine";
+import { ILdfTestCaseHandler } from "./ILdfTestCaseHandler";
 
 /**
  * A Linked Data Fragments test case data holder.
@@ -19,8 +19,9 @@ export interface ILdfTestCase extends ITestCase<ILdfQueryEngine> {
  * @param {Resource} resource A resource.
  * @return {Promise<ITestCase<any>>} A promise resolving to a test case object.
  */
-export async function ldfTestCaseFromResource(factory: LdfResponseMockerFactory, testCaseHandlers: {[uri: string]: ILdfTestCaseHandler<ITestCase<any>>},
-                                          options: IFetchOptions, resource: Resource): Promise<ITestCase<any>> {
+export async function ldfTestCaseFromResource(factory: LdfResponseMockerFactory,
+                                              testCaseHandlers: {[uri: string]: ILdfTestCaseHandler<ITestCase<any>>},
+                                              options: IFetchOptions, resource: Resource): Promise<ITestCase<any>> {
   const baseTestCase: ITestCaseData = {
     approval: resource.property.approval ? resource.property.approval.value : null,
     approvedBy: resource.property.approvedBy ? resource.property.approvedBy.value : null,
