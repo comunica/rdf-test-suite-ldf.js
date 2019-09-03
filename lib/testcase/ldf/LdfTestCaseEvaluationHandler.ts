@@ -1,10 +1,10 @@
-import { ITestCaseHandler, IQueryResult, TestCaseQueryEvaluationHandler, IFetchOptions, Util, IFetchResponse, ITestCaseData } from "rdf-test-suite";
+import { IQueryResult, TestCaseQueryEvaluationHandler, IFetchOptions, Util, IFetchResponse, ITestCaseData } from "rdf-test-suite";
 import { Resource } from "rdf-object";
 import { ILdfTestCase } from "./ILdfTestCase";
 import { ILdfQueryEngine } from "./ILdfQueryEngine";
 import { LdfResponseMocker } from "./mock/LdfResponseMocker";
 import * as stringifyStream from 'stream-to-string';
-import * as cph from '@comunica/actor-http-proxy';
+import { ProxyHandlerStatic } from '@comunica/actor-http-proxy';
 import * as fse from 'fs-extra';
 import { IDataSource, ISource } from "./IDataSource";
 import { LdfUtil } from "../../LdfUtil";
@@ -35,7 +35,7 @@ export class LdfTestCaseEvaluationHandler implements ILdfTestCaseHandler<LdfTest
     if(!action.property.query){
       throw new Error(`Missing qt:query in mf:action of ${resource}`);
     }
-    
+
     const queryResponse = await Util.fetchCached(resource.property.result.value, options);
     return new LdfTestCaseEvaluation(
       testCaseData,
@@ -79,7 +79,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
   public readonly uri: string;
 
   public readonly baseIRI: string; // IRI of query source
-  public readonly queryString: string; 
+  public readonly queryString: string;
   public readonly dataSources: IDataSource[];
   public readonly queryResult: IQueryResult;
   public readonly resultSource: IFetchResponse;
@@ -113,18 +113,18 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
       // Query and retrieve result
       this.mapSources(this.dataSources)
       .then(async (sources: ISource[]) => {
-        const result: IQueryResult = await engine.query(this.queryString, { 
-          sources,
-          httpProxyHandler: new cph.ProxyHandlerStatic(this.responseMocker.proxyAddress),
-        });
-  
+        const result: IQueryResult = await engine.queryLdf(sources, this.responseMocker.proxyAddress, this.queryString,
+          {
+            baseIRI: this.baseIRI,
+          });
+
         // Tear down the mock-server for all sources
         await this.responseMocker.tearDownServer();
-  
+
         if(this.createdFolder){
           fse.emptyDirSync(this.tmpFolder);
         }
-  
+
         if (! await this.queryResult.equals(result)) {
           reject(new Error(`${C.inColor('Invalid query evaluation', C.RED)}
         
@@ -171,7 +171,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             fse.ensureDirSync(this.tmpFolder);
 
             let hdtFile: string = source.value.split('/').slice(-1)[0];
-            
+
             if(! fse.existsSync(hdtFile)){
               await LdfUtil.fetchFile(this.tmpFolder, source);
             }
@@ -187,9 +187,9 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             if(! fse.existsSync(rdfjsFile)){
               await LdfUtil.fetchFile(this.tmpFolder, source);
             }
-            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(this.tmpFolder, rdfjsFile));        
+            let stream : NodeJS.ReadableStream = fse.createReadStream(Path.join(this.tmpFolder, rdfjsFile));
             const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });
-            
+
             if(! this.options || ! this.options.cachePath) this.createdFolder = true;
 
             is.value = await storeStream(quadStream);

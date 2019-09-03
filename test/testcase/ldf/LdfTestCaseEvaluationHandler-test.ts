@@ -11,6 +11,8 @@ import { Resource } from "rdf-object";
 import { QueryResultQuads, ITestCaseData } from "rdf-test-suite";
 import * as streamifyString from 'streamify-string';
 import { LdfResponseMockerFactory } from "../../../lib/factory/LdfResponseMockerFactory";
+import {ISource} from "../../../lib/testcase/ldf/IDataSource";
+import {ILdfQueryEngine} from "../../../lib/testcase/ldf/ILdfQueryEngine";
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {
@@ -231,13 +233,12 @@ describe('TestCaseLdfQueryEvaluation', () => {
 describe('LdfTestCaseEvaluation', () => {
 
   const handler = new LdfTestCaseEvaluationHandler();
-  const engine = {
-    parse: (queryString: string) => queryString === 'OK'
-      ? Promise.resolve(null) : Promise.reject(new Error('Invalid data ' + queryString)),
-    query: (queryString: string, options: {}) => Promise.resolve(new QueryResultQuads([
-      quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
-      quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
-    ])),
+  const engine: ILdfQueryEngine = {
+    queryLdf: (sources: ISource[], proxyUrl: string, queryString: string, options: {}) =>
+      Promise.resolve(new QueryResultQuads([
+        quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
+        quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
+      ])),
   };
 
   let context;
@@ -329,7 +330,7 @@ describe('LdfTestCaseEvaluation', () => {
       const testcase = new LdfTestCaseEvaluation(testCaseData, props, factory);
       expect(testcase.test(engine, {})).rejects.toBeTruthy();
     });
-  
+
   });
 
   describe('TPF', () => {
@@ -380,7 +381,7 @@ describe('LdfTestCaseEvaluation', () => {
       const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
 
       return expect(testCase.test(engine, {})).rejects.toBeTruthy();
-    
+
     });
 
   });
