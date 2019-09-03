@@ -55,7 +55,10 @@ export class LdfResponseMocker {
         } else {
           // This response should be mocked
           this.mockFetcher.parseMockedResponse(query).then((mockedResponse: IMockedResponse) => {
-            response.writeHead(200, {'Content-Type': mockedResponse.contentType });
+            response.writeHead(200, {
+              'Connection': 'Close', // Disable keep-alive headers to speedup closing of server
+              'Content-Type': mockedResponse.contentType,
+            });
             response.end(mockedResponse.body);
           });
         }
@@ -70,14 +73,12 @@ export class LdfResponseMocker {
   public async tearDownServer() {
     return new Promise((resolve, reject) => {
       if (this.dummyServer === undefined || ! this.dummyServer.listening ) {
-        return;
+        resolve();
       }
       this.dummyServer.close((err) => {
         if (err) {
           reject(err);
         }
-      });
-      this.dummyServer.on('close', () => {
         resolve();
       });
     });
