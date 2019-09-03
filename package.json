@@ -32,7 +32,6 @@
     "index.js"
   ],
   "pre-commit": [
-    "tsc",
     "lint",
     "test"
   ],
@@ -67,9 +66,7 @@
     "version": "manual-git-changelog onversion"
   },
   "devDependencies": {
-    "@comunica/actor-init-sparql-file": "^1.9.1",
-    "@comunica/actor-init-sparql-hdt": "^1.5.1",
-    "@comunica/actor-init-sparql-rdfjs": "^1.9.1",
+    "@comunica/mediatortype-time": "^1.9.0",
     "@types/jest": "^24.0.17",
     "@types/minimist": "^1.2.0",
     "@types/n3": "^1.1.0",
@@ -86,7 +83,8 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "@comunica/mediatortype-time": "^1.9.0",
+    "@comunica/actor-http-proxy": "^1.9.0",
+    "@comunica/bus-http": "^1.9.0",
     "@types/fs-extra": "^8.0.0",
     "@types/node-fetch": "^2.5.0",
     "fs-extra": "^8.1.0",
