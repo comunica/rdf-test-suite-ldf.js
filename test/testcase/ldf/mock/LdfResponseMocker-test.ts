@@ -1,4 +1,3 @@
-import * as phs from '@comunica/actor-http-proxy';
 import {blankNode, literal, namedNode} from "@rdfjs/data-model";
 import {ContextParser} from "jsonld-context-parser";
 import {Resource} from "rdf-object";
@@ -6,6 +5,8 @@ import * as quad from 'rdf-quad';
 import {IQueryResult, QueryResultQuads, TestCaseQueryEvaluationHandler, Util} from "rdf-test-suite";
 import * as streamifyString from 'streamify-string';
 import {LdfResponseMockerFactory} from "../../../../lib/factory/LdfResponseMockerFactory";
+import {ISource} from "../../../../lib/testcase/ldf/IDataSource";
+import {ILdfQueryEngine} from "../../../../lib/testcase/ldf/ILdfQueryEngine";
 import {
   LdfTestCaseEvaluation,
   LdfTestCaseEvaluationHandler,
@@ -35,13 +36,12 @@ const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(7000);
 describe('LdfResponseMocker', () => {
 
   const handler = new LdfTestCaseEvaluationHandler();
-  const engine = {
-    parse: (queryString: string) => queryString === 'OK'
-      ? Promise.resolve(null) : Promise.reject(new Error('Invalid data ' + queryString)),
-    query: (queryString: string, options: {[key: string]: any}) => Promise.resolve(new QueryResultQuads([
-      quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
-      quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
-    ])),
+  const engine: ILdfQueryEngine = {
+    queryLdf: (sources: ISource[], proxyUrl: string, queryString: string, options: {[key: string]: any}) =>
+      Promise.resolve(new QueryResultQuads([
+        quad('http://ex.org#s1', 'http://ex.org#o1', '"t1"'),
+        quad('http://ex.org#s1', 'http://ex.org#o1', '"t2"'),
+      ])),
   };
 
   let context;
@@ -112,10 +112,7 @@ describe('LdfResponseMocker', () => {
       await mocker.setUpServer();
       mocker.loadTest(testCase);
 
-      const result: IQueryResult = await engine.query(this.queryString, {
-        sources: this.querySources,
-        httpProxyHandler: new phs.ProxyHandlerStatic(mocker.proxyAddress),
-      });
+      const result: IQueryResult = await engine.queryLdf(this.querySources, mocker.proxyAddress, this.queryString, {});
 
       mocker.tearDownServer();
 
