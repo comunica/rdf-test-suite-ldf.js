@@ -1,7 +1,7 @@
 # rdf-test-suite-ldf.js
 [![Build Status](https://travis-ci.org/comunica/rdf-test-suite-ldf.js.svg?branch=master)](https://travis-ci.org/comunica/rdf-test-suite-ldf.js)
 [![Coverage Status](https://coveralls.io/repos/github/comunica/rdf-test-suite-ldf.js/badge.svg?branch=master)](https://coveralls.io/github/comunica/rdf-test-suite-ldf.js?branch=master)
-[![npm version](https://badge.fury.io/js/rdf-test-suite-ldf.svg)](https://www.npmjs.com/package/rdf-test-suite-ldf)
+[![npm version](https://badge.fury.io/js/rdf-test-suite-ldf.svg)](https://www.npmjs.com/package/rdf-test-suite-ldf) [![Greenkeeper badge](https://badges.greenkeeper.io/comunica/rdf-test-suite-ldf.js.svg)](https://greenkeeper.io/)
 
 This is a nodejs CLI-tool which executes integration-tests on query-engines such as the [comunica-engines](https://github.com/comunica/comunica) and is based on the [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) written by [Ruben Taelman](https://github.com/rubensworks).
 
