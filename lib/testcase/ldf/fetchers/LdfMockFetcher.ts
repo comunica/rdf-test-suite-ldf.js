@@ -23,8 +23,12 @@ export class LdfMockFetcher {
   public parseMockedResponse(requestedURI: string): Promise<IMockedResponse> {
     return new Promise((resolve, reject) => {
       let body = '';
-      const req: ClientRequest = https.request(this.getMockedFileURI(this.test.mockFolder, requestedURI));
+      const mockedUrl = this.getMockedFileURI(this.test.mockFolder, requestedURI);
+      const req: ClientRequest = https.request(mockedUrl);
       req.on('response', (incoming: IncomingMessage) => {
+        if (incoming.statusCode !== 200) {
+          throw new Error(`Error while fetching ${mockedUrl} (${incoming.statusCode}): ${incoming.statusMessage}`);
+        }
         incoming.setEncoding('utf8');
         incoming.on('data', (chunk: any) => {
           if (typeof chunk !== 'string') {
