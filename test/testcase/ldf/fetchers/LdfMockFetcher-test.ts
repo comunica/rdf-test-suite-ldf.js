@@ -68,13 +68,6 @@ describe('LdfMockFetcher', () => {
       return expect(mockFetcher.parseMockedResponse(requestedURI)).resolves.toBeTruthy();
     });
 
-    it('should not resolve', () => {
-      nock('https://md.bu').get('/mockfolder/f24cc7f355c770c76d1bd6b39770f35a2ef48fbf')
-      .reply(200, null);
-
-      return expect(mockFetcher.parseMockedResponse(requestedURI)).rejects.toBeTruthy();
-    });
-
     const props2: ILdfTestCaseEvaluationProps = {
       baseIRI: "",
       queryString: "",

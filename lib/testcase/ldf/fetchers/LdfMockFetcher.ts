@@ -2,6 +2,7 @@ import * as crypto from 'crypto';
 import { ClientRequest, IncomingMessage } from "http";
 import * as https from 'https';
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
+import { logger } from '../../../factory/Logger';
 
 /**
  * Class that fetches the mocked testfiles.
@@ -39,9 +40,10 @@ export class LdfMockFetcher {
         incoming.on('end', () => {
           // parse response and return
           try {
-            const headers: any = this.parseMockedFileHeaders(requestedURI, body.split('\n').splice(0, 3).join('\n'));
+            const headerResponse: IHeaderResponse = this.pickHeaderLines(body);
+            const headers: any = this.parseMockedFileHeaders(mockedUrl, headerResponse.header);
             const response: IMockedResponse = {
-              body: body.split('\n').splice(3).join('\n'),
+              body: headerResponse.body,
               contentType: headers['Content-type'],
               iri: headers['Hashed IRI'],
               query: headers.Query,
@@ -77,16 +79,46 @@ export class LdfMockFetcher {
    */
   private parseMockedFileHeaders(uri: string, headers: string): any {
     const result: any = {};
-    for (let line of headers.split('\n')) {
-      if (line.indexOf(':') < 0) {
-        throw new Error(`Mocked testfile does not have valid header line: ${line} - ${uri}`);
+    const parts: string[] = [];
+    let part: string = '';
+    for (const line of headers.split('\n')) {
+      if (line.startsWith('#')) {
+        if (part.length > 0) {
+          parts.push(part);
+        }
+        part = '';
       }
-      line = line.substring(2); // Remove '# '
-      const key = line.substring(0, line.indexOf(':')).trim(); // Parse key
-      const value = line.substring(line.indexOf(':') + 1).trim(); // Parse value
+      part += line;
+    }
+    parts.push(part);
+    part = '';
+    for (part of parts) {
+      if (part.indexOf(':') < 0) {
+        throw new Error(`Mocked testfile does not have valid header line: ${part} - ${uri}`);
+      }
+      part = part.substring(2); // Remove '# '
+      const key = part.substring(0, part.indexOf(':')).trim(); // Parse key
+      const value = part.substring(part.indexOf(':') + 1).trim(); // Parse value
       result[key] = value; // Put in dictionary
     }
     return result;
+  }
+
+  private pickHeaderLines(body: string): IHeaderResponse {
+    const headerLines = [];
+    let hashcount = 0;
+    while (hashcount < 3) {
+      const line = body.split('\n')[0];
+      body = body.split('\n').splice(1).join('\n');
+      if (line.startsWith('#')) {
+        hashcount += 1;
+      }
+      headerLines.push(line);
+    }
+    return {
+      body,
+      header: headerLines.join('\n'),
+    };
   }
 
 }
@@ -98,5 +130,13 @@ export interface IMockedResponse {
   query: string;
   iri: string;
   contentType: string;
+  body: string;
+}
+
+/**
+ * Interface representing the header and the body of a mocked testfile;
+ */
+export interface IHeaderResponse {
+  header: string;
   body: string;
 }
