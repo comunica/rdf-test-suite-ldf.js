@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.1"></a>
+## [v1.1.1](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.0...v1.1.1) - 2019-09-18
+
+### Fixed
+* [Fix edge case causing crashes with headers, closes #26](https://github.com/comunica/rdf-test-suite-ldf.js/commit/62ad2f65ec129f91a9a1dc10ecc08585175ddf98)
+
 <a name="v1.1.0"></a>
 ## [v1.1.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.0.0...v1.1.0) - 2019-09-17
 
