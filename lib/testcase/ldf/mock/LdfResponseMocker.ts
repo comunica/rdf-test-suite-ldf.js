@@ -1,5 +1,6 @@
 import { Server } from "http";
 import * as http from 'http';
+import * as url from "url";
 import { LdfUtil } from "../../../LdfUtil";
 import { IMockedResponse, LdfMockFetcher } from "../fetchers/LdfMockFetcher";
 import { IDataSource } from "../IDataSource";
@@ -40,6 +41,7 @@ export class LdfResponseMocker {
         if (this.isWhiteListed(query.split('/').slice(0, 3).join('/'))) {
           // This response should not be mocked
           const options = {
+            ...url.parse(query),
             headers: {
               accept: request.headers.accept,
             },
@@ -48,7 +50,7 @@ export class LdfResponseMocker {
           const client = LdfUtil.getHttpSClient(query.split('/')[0]);
 
           // Forward request and pipe to requesting instance
-          const connector = client.request(query, options, (resp: any) => {
+          const connector = client.request(options, (resp: any) => {
             resp.pipe(response);
           });
           request.pipe(connector);
