@@ -1,7 +1,7 @@
 import { Server } from "http";
 import * as http from 'http';
-import * as url from "url";
-import { LdfUtil } from "../../../LdfUtil";
+import {Util} from "rdf-test-suite";
+import {IFetchOptions} from "rdf-test-suite/lib/Util";
 import { IMockedResponse, LdfMockFetcher } from "../fetchers/LdfMockFetcher";
 import { IDataSource } from "../IDataSource";
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
@@ -15,14 +15,16 @@ export class LdfResponseMocker {
   private dataSources: IDataSource[];
   private whiteList: string[];
   private mockFetcher: LdfMockFetcher;
+  private options: IFetchOptions;
 
-  constructor(port?: number) {
+  constructor(options: IFetchOptions, port?: number) {
     // server will be initialized later
     this.dummyServer = undefined;
 
     // datasources will be initialized when a test is loaded
     this.dataSources = undefined;
 
+    this.options = options;
     this.port = port ? port : 3000; // Default port is 3000
     this.proxyAddress = `http://127.0.0.1:${this.port}/`; // Proxy address of the proxy server
   }
@@ -40,23 +42,17 @@ export class LdfResponseMocker {
         // Whitelist: little hack, should be improved
         if (this.isWhiteListed(query.split('/').slice(0, 3).join('/'))) {
           // This response should not be mocked
-          const options = {
-            ...url.parse(query),
-            headers: {
-              accept: request.headers.accept,
-            },
-          };
-
-          const client = LdfUtil.getHttpSClient(query.split('/')[0]);
 
           // Forward request and pipe to requesting instance
-          const connector = client.request(options, (resp: any) => {
-            resp.pipe(response);
-          });
-          request.pipe(connector);
+          const fetched = await Util.fetchCached(request.url, this.options,
+            { headers: { accept: request.headers.accept } });
+          const headers: any = {};
+          fetched.headers.forEach((v: string, k: string) => headers[k] = v);
+          response.writeHead(200, headers);
+          response.end(fetched.body);
         } else {
           // This response should be mocked
-          this.mockFetcher.parseMockedResponse(query).then((mockedResponse: IMockedResponse) => {
+          this.mockFetcher.parseMockedResponse(query, this.options).then((mockedResponse: IMockedResponse) => {
             response.writeHead(200, {
               'Connection': 'Close', // Disable keep-alive headers to speedup closing of server
               'Content-Type': mockedResponse.contentType,

@@ -27,7 +27,7 @@ describe('LdfMockFetcher', () => {
     resultSource: null,
     mockFolder: 'https://md.bu/mockfolder',
   };
-  const object = new LdfTestCaseEvaluation(testCaseData, props, new LdfResponseMockerFactory(5000));
+  const object = new LdfTestCaseEvaluation(testCaseData, props, new LdfResponseMockerFactory({}, 5000));
   const mockFetcher = new LdfMockFetcher(object);
 
   describe('#parseMockedResponse', () => {
@@ -76,7 +76,7 @@ describe('LdfMockFetcher', () => {
       resultSource: null,
       mockFolder: 'https://md.bu/mockfolder/',
     };
-    const object2 = new LdfTestCaseEvaluation(testCaseData, props2, new LdfResponseMockerFactory(5000));
+    const object2 = new LdfTestCaseEvaluation(testCaseData, props2, new LdfResponseMockerFactory({}, 5000));
     const mockFetcher2 = new LdfMockFetcher(object2);
 
     it('should remove trailing slash and try multiple accept', () => {

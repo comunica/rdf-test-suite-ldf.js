@@ -183,7 +183,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
           const hdtFile: string = source.value.split('/').slice(-1)[0];
 
           if (!fse.existsSync(hdtFile)) {
-            await LdfUtil.fetchFile(this.tmpFolder, source);
+            await LdfUtil.fetchFile(this.tmpFolder, source, this.options);
           }
           if (! this.options || ! this.options.cachePath) {
             this.createdFolder = true;
@@ -197,7 +197,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
 
           const rdfjsFile: string = source.value.split('/').slice(-1)[0];
           if (!fse.existsSync(rdfjsFile)) {
-            await LdfUtil.fetchFile(this.tmpFolder, source);
+            await LdfUtil.fetchFile(this.tmpFolder, source, this.options);
           }
           const stream: NodeJS.ReadableStream = fse.createReadStream(Path.join(this.tmpFolder, rdfjsFile));
           const quadStream = rdfParser.parse(stream, { contentType: 'text/turtle' });

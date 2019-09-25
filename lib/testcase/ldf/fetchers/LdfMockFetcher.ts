@@ -1,8 +1,6 @@
 import * as crypto from 'crypto';
-import { ClientRequest, IncomingMessage } from "http";
-import * as https from 'https';
+import {IFetchOptions, Util} from "rdf-test-suite";
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
-import { logger } from '../../../factory/Logger';
 
 /**
  * Class that fetches the mocked testfiles.
@@ -19,42 +17,33 @@ export class LdfMockFetcher {
    * Parse the mocked testfiles.
    * @param requestedURI The URI of the request the engine requests
    * @param object The LdfTestCaseEvaluation we're testing
+   * @param {IFetchOptions} options Options for fetching.
    * @returns IMockedResponse representing the mocked testfiles
    */
-  public parseMockedResponse(requestedURI: string): Promise<IMockedResponse> {
-    return new Promise((resolve, reject) => {
+  public parseMockedResponse(requestedURI: string, options?: IFetchOptions): Promise<IMockedResponse> {
+    return new Promise(async (resolve, reject) => {
       let body = '';
       const mockedUrl = this.getMockedFileURI(this.test.mockFolder, requestedURI);
-      const req: ClientRequest = https.request(mockedUrl);
-      req.on('response', (incoming: IncomingMessage) => {
-        if (incoming.statusCode !== 200) {
-          throw new Error(`Error while fetching ${mockedUrl} (${incoming.statusCode}): ${incoming.statusMessage}`);
-        }
-        incoming.setEncoding('utf8');
-        incoming.on('data', (chunk: any) => {
-          if (typeof chunk !== 'string') {
-            throw new Error(`Content of request should be string: ${chunk}`);
-          }
-          body += chunk;
-        });
-        incoming.on('end', () => {
-          // parse response and return
-          try {
-            const headerResponse: IHeaderResponse = this.pickHeaderLines(body);
-            const headers: any = this.parseMockedFileHeaders(mockedUrl, headerResponse.header);
-            const response: IMockedResponse = {
-              body: headerResponse.body,
-              contentType: headers['Content-type'],
-              iri: headers['Hashed IRI'],
-              query: headers.Query,
-            };
-            resolve(response);
-          } catch (err) {
-            reject(err);
-          }
-        });
+      const { body: incoming } = await Util.fetchCached(mockedUrl, options);
+      incoming.on('data', (chunk: any) => {
+        body += chunk;
       });
-      req.end();
+      incoming.on('end', () => {
+        // parse response and return
+        try {
+          const headerResponse: IHeaderResponse = this.pickHeaderLines(body);
+          const headers: any = this.parseMockedFileHeaders(mockedUrl, headerResponse.header);
+          const response: IMockedResponse = {
+            body: headerResponse.body,
+            contentType: headers['Content-type'],
+            iri: headers['Hashed IRI'],
+            query: headers.Query,
+          };
+          resolve(response);
+        } catch (err) {
+          reject(err);
+        }
+      });
     });
   }
 
@@ -69,6 +58,7 @@ export class LdfMockFetcher {
       // test the mockfolderURI on trailing slashes
       mockFolderURI = mockFolderURI.slice(0, mockFolderURI.length - 1);
     }
+
     return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex');
   }
 

@@ -20,13 +20,6 @@ describe('LdfUtil', () => {
     });
   });
 
-  describe('#getHttpSClient', () => {
-    it('should return http clients', () => {
-      expect(LdfUtil.getHttpSClient('http:')).toEqual(require('http'));
-      expect(LdfUtil.getHttpSClient('https:')).toEqual(require('https'));
-    });
-  });
-
   describe('#fetchFile', () => {
 
     it('should correctly fetch a file', async () => {

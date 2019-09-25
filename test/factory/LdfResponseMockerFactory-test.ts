@@ -7,7 +7,7 @@ describe('LdfResponseMockerFactory', () => {
 
     it('should use default port', async () => {
 
-      const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory();
+      const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory({});
       const mocker: LdfResponseMocker = await factory.getNewLdfResponseMocker();
       expect(mocker.proxyAddress).toEqual('http://127.0.0.1:3000/');
 
@@ -15,8 +15,8 @@ describe('LdfResponseMockerFactory', () => {
 
     it('should error when the port is in use', async () => {
 
-      const factory1: LdfResponseMockerFactory = new LdfResponseMockerFactory(7777);
-      const factory2: LdfResponseMockerFactory = new LdfResponseMockerFactory(7777);
+      const factory1: LdfResponseMockerFactory = new LdfResponseMockerFactory({}, 7777);
+      const factory2: LdfResponseMockerFactory = new LdfResponseMockerFactory({}, 7777);
 
       const mocker1: LdfResponseMocker = await factory1.getNewLdfResponseMocker();
       await mocker1.setUpServer();
@@ -27,7 +27,7 @@ describe('LdfResponseMockerFactory', () => {
 
     it('should error when the port is invalid', async () => {
 
-      const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(-1000);
+      const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory({}, -1000);
       await expect(factory.getNewLdfResponseMocker()).rejects.toBeTruthy();
 
     });

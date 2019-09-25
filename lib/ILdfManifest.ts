@@ -15,7 +15,7 @@ export async function ldfManifestFromResource(testCaseHandlers: {[uri: string]: 
                                               options: IFetchOptions, resource: Resource, startPort?: number):
   Promise<IManifest> {
   // The factory will allow each ITestCase to setup a mocking server if needed
-  let factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(startPort);
+  let factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(options, startPort);
   let res: IManifest = {
     comment: resource.property.comment ? resource.property.comment.value : null,
     label: resource.property.label ? resource.property.label.value : null,

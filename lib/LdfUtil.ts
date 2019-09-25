@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import * as Path from "path";
+import {Util} from "rdf-test-suite";
+import {IFetchOptions} from "rdf-test-suite/lib/Util";
 import { IDataSource } from './testcase/ldf/IDataSource';
 
 /**
@@ -20,39 +22,25 @@ export class LdfUtil {
   }
 
   /**
-   * Get a http(s)-client for requesting depending on the used protocol
-   * @param protocol The protocol based for whom we want a http(s)client
-   */
-  public static getHttpSClient(protocol: string): any {
-    switch(protocol) {
-    case "http:":
-      return require('http');
-    case "https:":
-      return require('https');
-    }
-  }
-
-  /**
    * Temporarily fetch a file for the query engine
    * @param folder: The folder where the temporary file should be saved
    * @param source: The IDataSource representing the source that should be fetched
+   * @param {IFetchOptions} options Options for fetching.
    */
-  public static async fetchFile(folder: string, source: IDataSource): Promise<string> {
+  public static async fetchFile(folder: string, source: IDataSource, options?: IFetchOptions): Promise<string> {
     return new Promise(async (resolve) => {
       const iri: string = source.value;
       // we want to re-use the current filename for the temp file
       const filename: string = iri.split('/').slice(-1)[0];
       const file = fs.createWriteStream(Path.join(folder, filename));
+      const { body } = await Util.fetchCached(iri, options);
 
-      this.getHttpSClient(iri.split('/')[0]).get(iri, (response: any) => {
-        response.on('data', (data: any) => {
-          file.write(data);
-        });
-        response.on('end', () => {
-          file.end();
-          resolve(filename);
-        });
-
+      body.on('data', (data: any) => {
+        file.write(data);
+      });
+      body.on('end', () => {
+        file.end();
+        resolve(filename);
       });
     });
   }
