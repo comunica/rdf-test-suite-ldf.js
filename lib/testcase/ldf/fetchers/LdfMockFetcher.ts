@@ -24,7 +24,12 @@ export class LdfMockFetcher {
     return new Promise(async (resolve, reject) => {
       let body = '';
       const mockedUrl = this.getMockedFileURI(this.test.mockFolder, requestedURI);
-      const { body: incoming } = await Util.fetchCached(mockedUrl, options);
+      let incoming;
+      try {
+        incoming = (await Util.fetchCached(mockedUrl, options)).body;
+      } catch (e) {
+        throw new Error(`Failed to fetch ${mockedUrl}, for original resource ${requestedURI}.`);
+      }
       incoming.on('data', (chunk: any) => {
         body += chunk;
       });
