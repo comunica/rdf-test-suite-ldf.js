@@ -44,12 +44,12 @@ export class LdfResponseMocker {
           // This response should not be mocked
 
           // Forward request and pipe to requesting instance
-          const fetched = await Util.fetchCached(request.url, this.options,
+          const fetched = await Util.fetchCached(request.url.substr(1), this.options,
             { headers: { accept: request.headers.accept } });
           const headers: any = {};
           fetched.headers.forEach((v: string, k: string) => headers[k] = v);
           response.writeHead(200, headers);
-          response.end(fetched.body);
+          fetched.body.pipe(response);
         } else {
           // This response should be mocked
           this.mockFetcher.parseMockedResponse(query, this.options).then((mockedResponse: IMockedResponse) => {
