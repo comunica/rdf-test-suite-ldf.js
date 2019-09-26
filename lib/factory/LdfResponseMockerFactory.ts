@@ -11,6 +11,7 @@ export class LdfResponseMockerFactory {
 
   constructor(options: IFetchOptions, port?: number) {
     // default port is 3000
+    this.options = options;
     this.currentPort = port ? port : 3000;
   }
 
