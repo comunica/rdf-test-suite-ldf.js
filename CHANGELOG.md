@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.3"></a>
+## [v1.1.3](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.2...v1.1.3) - 2019-09-27
+
+### Added
+* [Show unmocked URL when mocked URL fetching fails](https://github.com/comunica/rdf-test-suite-ldf.js/commit/3170525b2f4a298fd43a738373fa8af92d3e050f)
+
+### Fixed
+* [Fix some mocked responses failing](https://github.com/comunica/rdf-test-suite-ldf.js/commit/94857910f78cf8f9b41540c73b54b502ef032ca6)
+* [Fix fetch options not always being passed](https://github.com/comunica/rdf-test-suite-ldf.js/commit/fa3abff3fc50dccac24e48e06e60b49ca610f56d)
+* [Fix not all resources being cached](https://github.com/comunica/rdf-test-suite-ldf.js/commit/5d6e863b754033ef0db4c19e1afe5bb5f3f302b1)
+
 <a name="v1.1.2"></a>
 ## [v1.1.2](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.1...v1.1.2) - 2019-09-19
 
