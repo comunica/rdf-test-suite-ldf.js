@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.4"></a>
+## [v1.1.4](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.3...v1.1.4) - 2019-12-06
+
+### Fixed
+* [Fix temp files being read before writing finished](https://github.com/comunica/rdf-test-suite-ldf.js/commit/36a5927dfb962f07af879385e5660ab382a60f2f)
+
+### Changed
+* [Bump to rdf-test-suite 1.10.5 to fix caching issues with binary files](https://github.com/comunica/rdf-test-suite-ldf.js/commit/d6c1347ea4c61a68a362d76549442e35cd411699)
+
 <a name="v1.1.3"></a>
 ## [v1.1.3](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.2...v1.1.3) - 2019-09-27
 
