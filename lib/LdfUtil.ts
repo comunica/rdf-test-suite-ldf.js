@@ -34,14 +34,7 @@ export class LdfUtil {
       const filename: string = iri.split('/').slice(-1)[0];
       const file = fs.createWriteStream(Path.join(folder, filename));
       const { body } = await Util.fetchCached(iri, options);
-
-      body.on('data', (data: any) => {
-        file.write(data);
-      });
-      body.on('end', () => {
-        file.end();
-        resolve(filename);
-      });
+      body.pipe(file).on('finish', () => resolve(filename));
     });
   }
 
