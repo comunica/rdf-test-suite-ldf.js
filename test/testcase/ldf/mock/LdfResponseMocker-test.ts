@@ -112,7 +112,7 @@ describe('LdfResponseMocker', () => {
       await mocker.setUpServer();
       mocker.loadTest(testCase);
 
-      const result: IQueryResult = await engine.queryLdf(this.querySources, mocker.proxyAddress, this.queryString, {});
+      const result: IQueryResult = await engine.queryLdf(null, mocker.proxyAddress, null, {});
 
       mocker.tearDownServer();
 
