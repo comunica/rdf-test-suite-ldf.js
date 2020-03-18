@@ -1,8 +1,7 @@
 language: node_js
 node_js:
-  - "8"
   - "10"
-  # - "node" node 12 has still some problems with the hdt module
+  - "12"
 addons:
   apt:
     config:
