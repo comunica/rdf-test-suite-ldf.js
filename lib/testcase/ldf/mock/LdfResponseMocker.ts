@@ -58,6 +58,13 @@ export class LdfResponseMocker {
               'Content-Type': mockedResponse.contentType,
             });
             response.end(mockedResponse.body);
+          }).catch((error) => {
+            process.stderr.write(error.message + '\n');
+            response.writeHead(500, {
+              'Connection': 'Close', // Disable keep-alive headers to speedup closing of server
+              'Content-Type': 'text',
+            });
+            response.end(error.message);
           });
         }
       });

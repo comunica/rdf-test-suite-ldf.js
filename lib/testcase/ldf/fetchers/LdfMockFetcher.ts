@@ -28,7 +28,7 @@ export class LdfMockFetcher {
       try {
         incoming = (await Util.fetchCached(mockedUrl, options)).body;
       } catch (e) {
-        throw new Error(`Failed to fetch ${mockedUrl}, for original resource ${requestedURI}.`);
+        return reject(Error(`Failed to fetch ${mockedUrl}, for original resource ${requestedURI}.`));
       }
       incoming.on('data', (chunk: any) => {
         body += chunk;
