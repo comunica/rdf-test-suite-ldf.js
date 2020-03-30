@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.1.5"></a>
+## [v1.1.5](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.4...v1.1.5) - 2020-03-30
+
+### Fixed
+* [Fix 404s freezing application](https://github.com/comunica/rdf-test-suite-ldf.js/commit/05411159aa2637b1365bac1c4469a63ea621400d)
+
 <a name="v1.1.4"></a>
 ## [v1.1.4](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.3...v1.1.4) - 2019-12-06
 
