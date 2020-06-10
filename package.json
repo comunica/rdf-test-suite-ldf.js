@@ -68,7 +68,7 @@
     "version": "manual-git-changelog onversion"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.0",
+    "@types/jest": "^26.0.0",
     "@types/minimist": "^1.2.0",
     "@types/n3": "^1.1.4",
     "coveralls": "^3.0.6",
