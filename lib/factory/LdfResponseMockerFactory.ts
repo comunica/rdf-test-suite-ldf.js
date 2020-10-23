@@ -1,18 +1,19 @@
 import * as net from 'net';
 import {IFetchOptions} from "rdf-test-suite/lib/Util";
 import { LdfResponseMocker } from "../testcase/ldf/mock/LdfResponseMocker";
+import { ILdfTestSuiteConfig } from '../LdfTestSuiteRunner';
 // tslint:disable:no-var-requires
 const tcpPortUsed = require('tcp-port-used');
 // tslint:enable:no-var-requires
 export class LdfResponseMockerFactory {
 
-  private options: IFetchOptions;
+  public readonly options: IFetchOptions & ILdfTestSuiteConfig;
   private currentPort: number;
 
-  constructor(options: IFetchOptions, port?: number) {
+  constructor(options: IFetchOptions & ILdfTestSuiteConfig) {
     // default port is 3000
     this.options = options;
-    this.currentPort = port ? port : 3000;
+    this.currentPort = options.startPort ? options.startPort : 3000;
   }
 
   /**

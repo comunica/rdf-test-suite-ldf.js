@@ -21,18 +21,17 @@ export class LdfTestSuiteRunner extends TestSuiteRunner {
    * @return {Promise<ITestResult[]>} A promise resolving to an array of test results.
    */
   public async runManifest(manifestUrl: string, handler: any, config: ILdfTestSuiteConfig): Promise<ITestResult[]> {
-    const { cachePath, specification, urlToFileMapping, startPort } = config;
-    const urlToFileMappings = this.fromUrlToMappingString(urlToFileMapping);
+    config.urlToFileMapping = <any> this.fromUrlToMappingString(config.urlToFileMapping);
     const manifest: IManifest = await new LdfManifestLoader()
-      .from(manifestUrl, { cachePath, urlToFileMappings }, startPort);
+      .from(manifestUrl, config);
     const results: ITestResult[] = [];
 
     // Only run the tests for the given specification if one was defined.
-    if (specification) {
-      if (!manifest.specifications || !manifest.specifications[specification]) {
+    if (config.specification) {
+      if (!manifest.specifications || !manifest.specifications[config.specification]) {
         return [];
       }
-      await this.runManifestConcrete(manifest.specifications[specification], handler, config, results);
+      await this.runManifestConcrete(manifest.specifications[config.specification], handler, config, results);
       return results;
     }
 
@@ -98,4 +97,5 @@ export interface ILdfTestSuiteConfig {
   testRegex?: RegExp;
   urlToFileMapping?: string;
   startPort?: number;
+  serverTerminationDelay?: number;
 }

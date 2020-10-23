@@ -46,7 +46,7 @@ const tpfUrl: string = 'https://comunica.github.io/ontology-query-testing/ontolo
 const fileUrl: string = 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File';
 const notSupported: string = 'https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#NS';
 
-const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory({}, 6000);
+const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(<any> { startPort: 6000 });
 
 describe('TestCaseLdfQueryEvaluation', () => {
 

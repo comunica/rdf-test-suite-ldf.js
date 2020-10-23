@@ -31,7 +31,7 @@ import {LdfResponseMocker} from "../../../../lib/testcase/ldf/mock/LdfResponseMo
   return Promise.resolve(new Response(body, <any> { headers, status: 200, url }));
 };
 
-const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory({}, 7000);
+const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(<any> { startPort: 7000 });
 
 describe('LdfResponseMocker', () => {
 

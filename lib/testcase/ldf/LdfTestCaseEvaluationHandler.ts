@@ -128,6 +128,11 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
             baseIRI: this.baseIRI,
           });
 
+        // Wait a bit, as the engine may have background processes that will still need the server
+        if (this.factory.options.serverTerminationDelay > 0) {
+          await new Promise((subResolve) => setTimeout(subResolve, this.factory.options.serverTerminationDelay));
+        }
+
         // Tear down the mock-server for all sources
         await this.responseMocker.tearDownServer();
 

@@ -58,6 +58,17 @@ The `-c` flag inherited from [rdf-test-suite.js](https://github.com/rubensworks/
 $ rdf-test-suite-ldf myengine.js https://comunica.github.io/manifest-ldf-tests/sparql/sparql-manifest.ttl -c path/to/dir
 ```
 
+### Delay server termination
+
+With the `-v` flag you can define the time to wait before stopping the server after each completed test.
+This is useful in case your engine could perform additional HTTP to the server, even after the query has been done.
+
+```bash
+$ rdf-test-suite-ldf myengine.js https://comunica.github.io/manifest-ldf-tests/sparql/sparql-manifest.ttl -v 100
+```
+
+Defaults to `10`.
+
 ### Extra options
 
 A list of extra options, inherited from [rdf-test-suite.js](https://github.com/rubensworks/rdf-test-suite.js) can be found [here](https://github.com/rubensworks/rdf-test-suite.js/blob/master/README.md#test-filtering).

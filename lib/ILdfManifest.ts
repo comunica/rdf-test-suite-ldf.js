@@ -3,6 +3,7 @@ import { IFetchOptions, IManifest, ITestCase, ITestCaseHandler,
   manifestFromSpecificationResource, Util } from "rdf-test-suite";
 import { LdfResponseMockerFactory } from "./factory/LdfResponseMockerFactory";
 import { ldfTestCaseFromResource } from "./testcase/ldf/ILdfTestCase";
+import { ILdfTestSuiteConfig } from './LdfTestSuiteRunner';
 
 /**
  * Create a manifest object from a resource.
@@ -12,10 +13,10 @@ import { ldfTestCaseFromResource } from "./testcase/ldf/ILdfTestCase";
  * @return {Promise<IManifest>} A promise resolving to a manifest object.
  */
 export async function ldfManifestFromResource(testCaseHandlers: {[uri: string]: ITestCaseHandler<ITestCase<any>>},
-                                              options: IFetchOptions, resource: Resource, startPort?: number):
+                                              options: IFetchOptions & ILdfTestSuiteConfig, resource: Resource):
   Promise<IManifest> {
   // The factory will allow each ITestCase to setup a mocking server if needed
-  const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(options, startPort);
+  const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(options);
   const res: IManifest = {
     comment: resource.property.comment ? resource.property.comment.value : null,
     label: resource.property.label ? resource.property.label.value : null,

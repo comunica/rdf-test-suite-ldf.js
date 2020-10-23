@@ -3,6 +3,7 @@ import { IFetchOptions, IManifest, IManifestLoaderArgs, ITestCase,
   ITestCaseHandler, ManifestLoader } from "rdf-test-suite";
 import { logger } from "./factory/Logger";
 import { ldfManifestFromResource } from "./ILdfManifest";
+import { ILdfTestSuiteConfig } from './LdfTestSuiteRunner';
 
 export class LdfManifestLoader extends ManifestLoader {
 
@@ -27,12 +28,12 @@ export class LdfManifestLoader extends ManifestLoader {
    * @param {IFetchOptions} options The fetch options.
    * @return {Promise<IManifest>} A promise that resolves to a manifest object.
    */
-  public async from(url: string, options?: IFetchOptions, startPort?: number): Promise<IManifest> {
+  public async from(url: string, options: IFetchOptions & ILdfTestSuiteConfig): Promise<IManifest> {
     logger.info(`Loading objectloader for manifest creation`);
     const objectLoader = new RdfObjectLoader({ context: LdfManifestLoader.LOADER_CONTEXT });
     logger.info(`Importing manifest `);
     const manifest: Resource = await this.import(objectLoader, url, options);
-    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest, startPort);
+    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest);
   }
 
 }
