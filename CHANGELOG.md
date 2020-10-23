@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.2.0"></a>
+## [v1.2.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.4...v1.2.0) - 2020-10-23
+
+### Added
+* [Add option to delay server termination](https://github.com/comunica/rdf-test-suite-ldf.js/commit/d87006086e788f5fe23f7cfcfd001f20ef321f7b)
+
 <a name="v1.1.5"></a>
 ## [v1.1.5](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.1.4...v1.1.5) - 2020-03-30
 
