@@ -8,11 +8,11 @@ import {
   IFetchResponse,
   IQueryResult,
   ITestCaseData,
+  ITestResultOverride,
   TestCaseQueryEvaluationHandler,
   Util,
 } from "rdf-test-suite";
 import * as stringifyStream from 'stream-to-string';
-import * as C from '../../Colors';
 import {LdfResponseMockerFactory} from "../../factory/LdfResponseMockerFactory";
 import {logger} from "../../factory/Logger";
 import {LdfUtil} from "../../LdfUtil";
@@ -110,7 +110,7 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
     this.createdFolder = false;
   }
 
-  public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<void> {
+  public async test(engine: ILdfQueryEngine, injectArguments: any): Promise<ITestResultOverride> {
     return new Promise(async (resolve, reject) => {
       // Set up mock-server, load all resources
       this.responseMocker = await this.factory.getNewLdfResponseMocker();
@@ -118,15 +118,18 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
       this.responseMocker.loadTest(this);
 
       await this.responseMocker.setUpServer();
-      logger.info(C.inColor(`Run test: ${this.uri}`, C.GREEN));
+      logger.info(Util.withColor(`Run test: ${this.uri}`, Util.COLOR_GREEN));
 
       // Query and retrieve result
       this.mapSources(this.dataSources)
       .then(async (sources: ISource[]) => {
+        const timeStart = process.hrtime();
         const result: IQueryResult = await engine.queryLdf(sources, this.responseMocker.proxyAddress, this.queryString,
           {
             baseIRI: this.baseIRI,
           });
+        const timeEnd = process.hrtime(timeStart);
+        const duration = (timeEnd[0] * 1000) + (timeEnd[1] / 1000000);
 
         // Wait a bit, as the engine may have background processes that will still need the server
         if (this.factory.options.serverTerminationDelay > 0) {
@@ -141,20 +144,20 @@ export class LdfTestCaseEvaluation implements ILdfTestCase {
         }
 
         if (! await this.queryResult.equals(result)) {
-          reject(new Error(`${C.inColor('Invalid query evaluation', C.RED)}
+          reject(new Error(`${Util.withColor('Invalid query evaluation', Util.COLOR_RED)}
 
-        ${C.inColor('Query:', C.YELLOW)} ${this.queryString}
+        ${Util.withColor('Query:', Util.COLOR_YELLOW)} ${this.queryString}
 
-        ${C.inColor('Data:', C.YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}
+        ${Util.withColor('Data:', Util.COLOR_YELLOW)} ${JSON.stringify(this.dataSources) || 'none'}
 
-        ${C.inColor('Result Source:', C.YELLOW)} ${this.resultSource.url}
+        ${Util.withColor('Result Source:', Util.COLOR_YELLOW)} ${this.resultSource.url}
 
-        ${C.inColor('Expected:', C.YELLOW)} \n ${this.queryResult}
+        ${Util.withColor('Expected:', Util.COLOR_YELLOW)} \n ${this.queryResult}
 
-        ${C.inColor('Got:', C.YELLOW)} \n ${result.toString()}
+        ${Util.withColor('Got:', Util.COLOR_YELLOW)} \n ${result.toString()}
         `));
         }
-        resolve();
+        resolve({ duration });
       })
       .catch(async (reason: string) => {
         await this.responseMocker.tearDownServer();

@@ -1,4 +1,4 @@
-import {blankNode, literal, namedNode} from "@rdfjs/data-model";
+import {DataFactory} from "rdf-data-factory";
 import {ContextParser} from "jsonld-context-parser";
 import {Resource} from "rdf-object";
 import * as quad from 'rdf-quad';
@@ -12,6 +12,8 @@ import {
   LdfTestCaseEvaluationHandler,
 } from "../../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import {LdfResponseMocker} from "../../../../lib/testcase/ldf/mock/LdfResponseMocker";
+
+const DF = new DataFactory();
 
 // Mock fetch
 (<any> global).fetch = (url: string) => {
@@ -62,23 +64,23 @@ describe('LdfResponseMocker', () => {
         context = parsedContext;
 
         pAction = new Resource(
-          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action'), context });
+          { term: DF.namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#action'), context });
         pQuery = new Resource(
-          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-query#query'), context });
+          { term: DF.namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-query#query'), context });
         pResult = new Resource(
-          { term: namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
+          { term: DF.namedNode('http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#result'), context });
         pSourceType = new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#sourceType'), context });
+          { term: DF.namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#sourceType'), context });
         pTPF = new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF'), context });
+          { term: DF.namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#TPF'), context });
         pFile = new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File'), context });
+          { term: DF.namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#File'), context });
         pDataSources = new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#dataSources'), context });
+          { term: DF.namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#dataSources'), context });
         pSource = new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#source'), context });
+          { term: DF.namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#source'), context });
         pMockFolder =  new Resource(
-          { term: namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
+          { term: DF.namedNode('https://comunica.github.io/ontology-query-testing/ontology-query-testing.ttl#mockFolder'), context });
         done();
       });
     // tslint:enable:max-line-length
@@ -89,22 +91,22 @@ describe('LdfResponseMocker', () => {
     it('should set up a reachable and working server', async () => {
       const mocker: LdfResponseMocker = await factory.getNewLdfResponseMocker();
 
-      const resource = new Resource({ term: namedNode('http://example.org/test'), context });
-      const action = new Resource({ term: namedNode('blabla'), context });
-      action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
-      action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+      const resource = new Resource({ term: DF.namedNode('http://example.org/test'), context });
+      const action = new Resource({ term: DF.namedNode('blabla'), context });
+      action.addProperty(pQuery, new Resource({ term: DF.literal('ACTION.ok'), context }));
+      action.addProperty(pMockFolder, new Resource({ term: DF.literal('examplefolder'), context }));
 
-      const src1: Resource = new Resource({ term: blankNode(), context });
-      src1.addProperty(pSource, new Resource({ term: literal('https://ex2.org'), context }));
+      const src1: Resource = new Resource({ term: DF.blankNode(), context });
+      src1.addProperty(pSource, new Resource({ term: DF.literal('https://ex2.org'), context }));
       src1.addProperty(pSourceType, pTPF);
       const sources: Resource[] = [
         src1,
       ];
-      const dataSources = new Resource({ term: blankNode(), context });
+      const dataSources = new Resource({ term: DF.blankNode(), context });
       dataSources.list = sources;
 
       resource.addProperty(pAction, action);
-      resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
+      resource.addProperty(pResult, new Resource({ term: DF.literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
       const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
@@ -128,22 +130,22 @@ describe('LdfResponseMocker', () => {
     it('should forward request over https', async () => {
       const mocker: LdfResponseMocker = await factory.getNewLdfResponseMocker();
 
-      const resource = new Resource({ term: namedNode('http://example.org/test'), context });
-      const action = new Resource({ term: namedNode('blabla'), context });
-      action.addProperty(pQuery, new Resource({ term: literal('ACTION.ok'), context }));
-      action.addProperty(pMockFolder, new Resource({ term: literal('examplefolder'), context }));
+      const resource = new Resource({ term: DF.namedNode('http://example.org/test'), context });
+      const action = new Resource({ term: DF.namedNode('blabla'), context });
+      action.addProperty(pQuery, new Resource({ term: DF.literal('ACTION.ok'), context }));
+      action.addProperty(pMockFolder, new Resource({ term: DF.literal('examplefolder'), context }));
 
-      const src1: Resource = new Resource({ term: blankNode(), context });
-      src1.addProperty(pSource, new Resource({ term: literal('https://ex2.org'), context }));
+      const src1: Resource = new Resource({ term: DF.blankNode(), context });
+      src1.addProperty(pSource, new Resource({ term: DF.literal('https://ex2.org'), context }));
       src1.addProperty(pSourceType, pFile);
       const sources: Resource[] = [
         src1,
       ];
-      const dataSources = new Resource({ term: blankNode(), context });
+      const dataSources = new Resource({ term: DF.blankNode(), context });
       dataSources.list = sources;
 
       resource.addProperty(pAction, action);
-      resource.addProperty(pResult, new Resource({ term: literal('RESULT.ttl'), context }));
+      resource.addProperty(pResult, new Resource({ term: DF.literal('RESULT.ttl'), context }));
       resource.addProperty(pDataSources, dataSources);
 
       const testCase: LdfTestCaseEvaluation = await handler.resourceToLdfTestCase(resource, factory, <any> {});
