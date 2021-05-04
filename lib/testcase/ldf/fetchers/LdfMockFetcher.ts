@@ -18,12 +18,17 @@ export class LdfMockFetcher {
    * @param requestedURI The URI of the request the engine requests
    * @param object The LdfTestCaseEvaluation we're testing
    * @param {IFetchOptions} options Options for fetching.
+   * @param request Request metadata
    * @returns IMockedResponse representing the mocked testfiles
    */
-  public parseMockedResponse(requestedURI: string, options?: IFetchOptions): Promise<IMockedResponse> {
+  public parseMockedResponse(
+    requestedURI: string,
+    options: IFetchOptions,
+    request: { method: string, body?: string },
+  ): Promise<IMockedResponse> {
     return new Promise(async (resolve, reject) => {
       let body = '';
-      const mockedUrl = this.getMockedFileURI(this.test.mockFolder, requestedURI);
+      const mockedUrl = this.getMockedFileURI(this.test.mockFolder, requestedURI, request);
       let incoming;
       try {
         incoming = (await Util.fetchCached(mockedUrl, options)).body;
@@ -57,11 +62,16 @@ export class LdfMockFetcher {
    * URI of the folder containing the testfiles.
    * @param mockFolderURI The URI of the folder containing the mocked testfiles
    * @param requestedURI The URI of the request the engine requests
+   * @param request Request metadata
    */
-  private getMockedFileURI(mockFolderURI: string, requestedURI: string): string {
+  private getMockedFileURI(mockFolderURI: string, requestedURI: string, request: { method: string, body?: string }): string {
     if (mockFolderURI.endsWith('/')) {
       // test the mockfolderURI on trailing slashes
       mockFolderURI = mockFolderURI.slice(0, mockFolderURI.length - 1);
+    }
+
+    if (request.method === 'POST') {
+      requestedURI += '@@POST:' + request.body;
     }
 
     return mockFolderURI + '/' + crypto.createHash('sha1').update(decodeURIComponent(requestedURI)).digest('hex');

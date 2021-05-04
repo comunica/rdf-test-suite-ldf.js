@@ -5,6 +5,9 @@ import {IFetchOptions} from "rdf-test-suite/lib/Util";
 import { IMockedResponse, LdfMockFetcher } from "../fetchers/LdfMockFetcher";
 import { IDataSource } from "../IDataSource";
 import { LdfTestCaseEvaluation } from "../LdfTestCaseEvaluationHandler";
+import * as HTTP from 'http';
+// tslint:disable-next-line:no-var-requires
+const stringifyStream = require('stream-to-string');
 
 export class LdfResponseMocker {
 
@@ -36,7 +39,7 @@ export class LdfResponseMocker {
   public async setUpServer(): Promise<void> {
     return new Promise(async (resolve, reject) => {
       this.dummyServer = await http.createServer().listen(this.port);
-      this.dummyServer.on('request', async (request: any, response: any) => {
+      this.dummyServer.on('request', async (request: HTTP.IncomingMessage, response: HTTP.ServerResponse) => {
         const args: any = require('url').parse(request.url, true);
         const query: string = args.path.substring(1);
         // Whitelist: little hack, should be improved
@@ -52,7 +55,8 @@ export class LdfResponseMocker {
           fetched.body.pipe(response);
         } else {
           // This response should be mocked
-          this.mockFetcher.parseMockedResponse(query, this.options).then((mockedResponse: IMockedResponse) => {
+          const body = await stringifyStream(request);
+          this.mockFetcher.parseMockedResponse(query, this.options, { method: request.method, body }).then((mockedResponse: IMockedResponse) => {
             response.writeHead(200, {
               'Connection': 'Close', // Disable keep-alive headers to speedup closing of server
               'Content-Type': mockedResponse.contentType,

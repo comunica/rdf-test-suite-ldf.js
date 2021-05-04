@@ -39,7 +39,7 @@ describe('LdfMockFetcher', () => {
 # Content-type: application/trig;charset=utf-8
 @prefix void: <http://rdfs.org/ns/void#>.`);
 
-      mockFetcher.parseMockedResponse(requestedURI).then((value: IMockedResponse) => {
+      mockFetcher.parseMockedResponse(requestedURI, {}, { method: 'GET' }).then((value: IMockedResponse) => {
         expect(value.body).toEqual(`@prefix void: <http://rdfs.org/ns/void#>.`);
         expect(value.contentType).toEqual(`application/trig;charset=utf-8`);
         expect(value.iri).toEqual(`http://ex.org/`);
@@ -55,7 +55,7 @@ describe('LdfMockFetcher', () => {
 # Content-type: application/trig;charset=utf-8
 @prefix void: <http://rdfs.org/ns/void#>.`);
 
-      return expect(mockFetcher.parseMockedResponse(requestedURI)).resolves.toBeTruthy();
+      return expect(mockFetcher.parseMockedResponse(requestedURI, {}, { method: 'GET' })).resolves.toBeTruthy();
     });
 
     it('should resolve with .srj', () => {
@@ -65,7 +65,7 @@ describe('LdfMockFetcher', () => {
 # Content-type: application/sparql-results+json
 @prefix void: <http://rdfs.org/ns/void#>.`);
 
-      return expect(mockFetcher.parseMockedResponse(requestedURI)).resolves.toBeTruthy();
+      return expect(mockFetcher.parseMockedResponse(requestedURI, {}, { method: 'GET' })).resolves.toBeTruthy();
     });
 
     const props2: ILdfTestCaseEvaluationProps = {
@@ -86,7 +86,7 @@ describe('LdfMockFetcher', () => {
 # Content-type: application/sparql-results+json
 @prefix void: <http://rdfs.org/ns/void#>.`);
 
-      return expect(mockFetcher2.parseMockedResponse(requestedURI)).resolves.toBeTruthy();
+      return expect(mockFetcher2.parseMockedResponse(requestedURI, {}, { method: 'GET' })).resolves.toBeTruthy();
     });
 
   });
