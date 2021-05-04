@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.4.0"></a>
+## [v1.4.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.3.0...v1.4.0) - 2021-05-04
+
+### Added
+* [Support replaying POST requests](https://github.com/comunica/rdf-test-suite-ldf.js/commit/d0353def7cd24fd80eee5dfc1c6b9bf4635ddede)
+
 <a name="v1.3.0"></a>
 ## [v1.3.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.2.0...v1.3.0) - 2020-10-23
 
