@@ -1,9 +1,7 @@
 import {DataFactory} from "rdf-data-factory";
 import {ContextParser} from "jsonld-context-parser";
 import {Resource} from "rdf-object";
-import * as quad from 'rdf-quad';
 import {IQueryResult, QueryResultQuads, TestCaseQueryEvaluationHandler, Util} from "rdf-test-suite";
-import * as streamifyString from 'streamify-string';
 import {LdfResponseMockerFactory} from "../../../../lib/factory/LdfResponseMockerFactory";
 import {ISource} from "../../../../lib/testcase/ldf/IDataSource";
 import {ILdfQueryEngine} from "../../../../lib/testcase/ldf/ILdfQueryEngine";
@@ -12,6 +10,8 @@ import {
   LdfTestCaseEvaluationHandler,
 } from "../../../../lib/testcase/ldf/LdfTestCaseEvaluationHandler";
 import {LdfResponseMocker} from "../../../../lib/testcase/ldf/mock/LdfResponseMocker";
+const quad = require('rdf-quad');
+const streamifyString = require('streamify-string');
 
 const DF = new DataFactory();
 
@@ -46,16 +46,16 @@ describe('LdfResponseMocker', () => {
       ])),
   };
 
-  let context;
-  let pAction;
-  let pQuery;
-  let pResult;
-  let pSourceType;
-  let pTPF;
-  let pFile;
-  let pDataSources;
-  let pSource;
-  let pMockFolder;
+  let context: any;
+  let pAction: any;
+  let pQuery: any;
+  let pResult: any;
+  let pSourceType: any;
+  let pTPF: any;
+  let pFile: any;
+  let pDataSources: any;
+  let pSource: any;
+  let pMockFolder: any;
 
   beforeEach((done) => {
     // tslint:disable:max-line-length
