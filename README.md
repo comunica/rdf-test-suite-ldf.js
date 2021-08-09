@@ -1,5 +1,6 @@
 # rdf-test-suite-ldf.js
-[![Build Status](https://travis-ci.org/comunica/rdf-test-suite-ldf.js.svg?branch=master)](https://travis-ci.org/comunica/rdf-test-suite-ldf.js)
+
+[![Build status](https://github.com/comunica/rdf-test-suite-ldf.js/workflows/CI/badge.svg)](https://github.com/comunica/rdf-test-suite-ldf.js/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/comunica/rdf-test-suite-ldf.js/badge.svg?branch=master)](https://coveralls.io/github/comunica/rdf-test-suite-ldf.js?branch=master)
 [![npm version](https://badge.fury.io/js/rdf-test-suite-ldf.svg)](https://www.npmjs.com/package/rdf-test-suite-ldf)
 
