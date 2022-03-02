@@ -37,7 +37,7 @@ export class LdfResponseMocker {
    * to the tested engine.
    */
   public async setUpServer(): Promise<void> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise<void>(async (resolve, reject) => {
       this.dummyServer = await http.createServer().listen(this.port);
       this.dummyServer.on('request', async (request: HTTP.IncomingMessage, response: HTTP.ServerResponse) => {
         const args: any = require('url').parse(request.url, true);
@@ -80,7 +80,7 @@ export class LdfResponseMocker {
    * Tear the server down after quering, avoid spilling resources and leaving ports blocked.
    */
   public async tearDownServer() {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (this.dummyServer === undefined || ! this.dummyServer.listening ) {
         resolve();
       }

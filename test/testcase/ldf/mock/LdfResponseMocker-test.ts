@@ -33,7 +33,7 @@ const DF = new DataFactory();
   return Promise.resolve(new Response(body, <any> { headers, status: 200, url }));
 };
 
-const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(<any> { startPort: 7000 });
+const factory: LdfResponseMockerFactory = new LdfResponseMockerFactory(<any> { startPort: 7001 });
 
 describe('LdfResponseMocker', () => {
 
@@ -123,7 +123,7 @@ describe('LdfResponseMocker', () => {
         Util.identifyContentType('RESULT.ttl', queryResponse.headers),
         queryResponse.url, queryResponse.body);
 
-      expect(mocker.proxyAddress).toEqual('http://127.0.0.1:7000/');
+      expect(mocker.proxyAddress).toEqual('http://127.0.0.1:7001/');
       expect(await queryResult.equals(result)).toBeTruthy();
     });
 
