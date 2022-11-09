@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.4.2"></a>
+## [v1.4.2](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.1...v1.4.2) - 2022-11-09
+
+### Fixed
+* [Include source map files in packed files](https://github.com/comunica/rdf-test-suite-ldf.js/commit/553263a613f1da43e52d21a7ecbb7ce10265f582)
+
 <a name="v1.4.1"></a>
 ## [v1.4.1](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.0...v1.4.1) - 2022-03-02
 

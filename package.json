@@ -1,6 +1,6 @@
 {
   "name": "rdf-test-suite-ldf",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "An engine testing suite",
   "keywords": [
     "sparql",
