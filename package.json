@@ -70,7 +70,7 @@
     "version": "manual-git-changelog onversion"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.0",
+    "@types/jest": "^29.0.0",
     "@types/minimist": "^1.2.0",
     "@types/n3": "^1.1.4",
     "jest": "^27.0.1",
@@ -79,7 +79,7 @@
     "nock": "^13.0.0",
     "pre-commit": "^1.2.2",
     "precommit": "^1.2.2",
-    "ts-jest": "^27.0.1",
+    "ts-jest": "^29.0.0",
     "tslint": "^6.0.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^4.6.2"
