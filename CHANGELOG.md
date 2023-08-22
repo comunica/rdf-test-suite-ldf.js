@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.5.0"></a>
+## [v1.5.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.2...v1.5.0) - 2023-08-22
+
+### Changed
+* [Forward failing mocks as actual requests](https://github.com/comunica/rdf-test-suite-ldf.js/commit/bb955d065cf70f9083f62b905df378a3ca8eedca)
+
 <a name="v1.4.2"></a>
 ## [v1.4.2](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.1...v1.4.2) - 2022-11-09
 
