@@ -47,12 +47,7 @@ export class LdfResponseMocker {
           // This response should not be mocked
 
           // Forward request and pipe to requesting instance
-          const fetched = await Util.fetchCached(request.url.substr(1), this.options,
-            { headers: { accept: request.headers.accept } });
-          const headers: any = {};
-          fetched.headers.forEach((v: string, k: string) => headers[k] = v);
-          response.writeHead(200, headers);
-          fetched.body.pipe(response);
+          await this.forwardFetch(request, response);
         } else {
           // This response should be mocked
           const body = await stringifyStream(request);
@@ -62,18 +57,24 @@ export class LdfResponseMocker {
               'Content-Type': mockedResponse.contentType,
             });
             response.end(mockedResponse.body);
-          }).catch((error) => {
+          }).catch(async (error) => {
             process.stderr.write(error.message + '\n');
-            response.writeHead(500, {
-              'Connection': 'Close', // Disable keep-alive headers to speedup closing of server
-              'Content-Type': 'text',
-            });
-            response.end(error.message);
+            // If a request was not mocked, just do a regular request
+            await this.forwardFetch(request, response);
           });
         }
       });
       resolve();
     });
+  }
+
+  protected async forwardFetch(request: HTTP.IncomingMessage, response: HTTP.ServerResponse): Promise<void> {
+    const fetched = await Util.fetchCached(request.url.substr(1), this.options,
+      { headers: { accept: request.headers.accept } });
+    const headers: any = {};
+    fetched.headers.forEach((v: string, k: string) => headers[k] = v);
+    response.writeHead(200, headers);
+    fetched.body.pipe(response);
   }
 
   /**
