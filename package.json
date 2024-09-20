@@ -15,6 +15,10 @@
   "repository": "https://github.com/comunica/rdf-test-suite-ldf.js.git",
   "author": "Manu De Buck <manu@mdebuck.org>",
   "license": "MIT",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/comunica-association"
+  },
   "bugs": {
     "url": "https://github.com/comunica/rdf-test-suite-ldf.js/issues"
   },
