@@ -33,7 +33,7 @@ export class LdfManifestLoader extends ManifestLoader {
     const objectLoader = new RdfObjectLoader({ context: LdfManifestLoader.LOADER_CONTEXT });
     logger.info(`Importing manifest `);
     const manifest: Resource = await this.import(objectLoader, url, options);
-    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest);
+    return ldfManifestFromResource(this.ldfTestCaseHandlers, options, manifest, objectLoader);
   }
 
 }
