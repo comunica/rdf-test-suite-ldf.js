@@ -1,7 +1,7 @@
 import * as fse from 'fs-extra';
 import * as Path from 'path';
 import {Resource} from "rdf-object";
-import rdfParser from "rdf-parse";
+import { rdfParser } from "rdf-parse";
 import {storeStream} from "rdf-store-stream";
 import {
   IFetchOptions,
