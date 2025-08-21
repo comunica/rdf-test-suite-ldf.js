@@ -29,7 +29,7 @@ ${Util.withColor('Options:', Util.COLOR_YELLOW)}
   -t    regex for test IRIs to run
   -i    JSON string with custom options that need to be passed to the engine
   -d    time out duration for test cases (in milliseconds, default 30000)
-  -m    URL to local path mapping (e.g. 'https://w3c.github.io/json-ld-api/|/path/to/folder/')
+  -m    URL to local path mapping (e.g. 'https://w3c.github.io/json-ld-api/~/path/to/folder/')
   -r    The port number on which the mocking servers will start spawning (10000 by default)
   -v    Time (ms) to wait before stopping the server after each completed test
 `);
@@ -39,7 +39,7 @@ ${Util.withColor('Options:', Util.COLOR_YELLOW)}
 // Enable caching if needed
 let cachePath: string = null;
 if (args.c) {
-  if(! args.c.endsWith('/')){
+  if(args.c !== true && ! args.c.endsWith('/')){
     console.error(Util.withColor(`Please give a correct caching path. The path '${args.c}' is invalid. Did you forget a trailing slash?`, Util.COLOR_YELLOW));
     process.exit(1);
   }
