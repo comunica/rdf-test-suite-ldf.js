@@ -11,16 +11,13 @@ export class LdfTestSuiteRunner extends TestSuiteRunner {
    * Run the manifest with the given URL.
    * @param {string} manifestUrl The URL of a manifest.
    * @param handler The handler to run the tests with.
-   * @param {string} cachePath The base directory to cache files in. If falsy, then no cache will be used.
-   * @param {string} specification An optional specification to scope the manifest tests by.
-   * @param {RegExp} testRegex An optional regex to filter test IRIs by.
-   * @param {any} injectArguments An optional set of arguments to pass to the handler.
+   * @param config configurations.
    * @return {Promise<ITestResult[]>} A promise resolving to an array of test results.
    */
   public async runManifest(manifestUrl: string, handler: any, config: ILdfTestSuiteConfig): Promise<ITestResult[]> {
-    config.urlToFileMapping = <any> this.fromUrlToMappingString(config.urlToFileMapping);
+    const urlToFileMappings = this.fromUrlToMappingString(config.urlToFileMapping);
     const manifest: IManifest = await new LdfManifestLoader()
-      .from(manifestUrl, config);
+      .from(manifestUrl, { ...config, urlToFileMappings });
     const results: ITestResult[] = [];
 
     // Only run the tests for the given specification if one was defined.
