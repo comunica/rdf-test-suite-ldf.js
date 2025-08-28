@@ -44,6 +44,7 @@ export interface ILdfTestSuiteConfig {
   specification?: string;
   cachePath?: string;
   testRegex?: RegExp;
+  skipRegex?: RegExp;
   urlToFileMapping?: string;
   startPort?: number;
   serverTerminationDelay?: number;
