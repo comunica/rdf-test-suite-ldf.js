@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.2...v2.0.0) - 2025-11-14
+
+### BREAKING CHANGE
+* [Update to rdf-test-suite 2.1.1](https://github.com/comunica/rdf-test-suite-ldf.js/commit/c49aa38bbb8b2eb2e0d0023f5be279a2cb1e0cac)
+  * Should not be breaking in most cases
+
+### Added
+* [Allow tests to be skipped](https://github.com/comunica/rdf-test-suite-ldf.js/commit/902c54ff8c27f16ed7561ea0df5f8f013d6d35cf)
+
+### Fixed
+* [Fix broken -m option and value-less -c](https://github.com/comunica/rdf-test-suite-ldf.js/commit/fdf4be416d0f62914d2b2f25a2f25f9e5c9a7f8a)
+
 <a name="v1.5.0"></a>
 ## [v1.5.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.2...v1.5.0) - 2023-08-22
 
