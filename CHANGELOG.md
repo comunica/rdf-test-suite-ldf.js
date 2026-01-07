@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.1"></a>
+## [v2.0.1](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v2.0.0...v2.0.1) - 2026-01-07
+
+### Changed
+* [Update to n3 v2](https://github.com/comunica/rdf-test-suite-ldf.js/commit/0ce9857a1e08ac62aab55ac59006f642bb98bc2e)
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v1.4.2...v2.0.0) - 2025-11-14
 
