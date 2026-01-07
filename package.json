@@ -93,10 +93,10 @@
     "fs-extra": "^9.0.0",
     "global": "^4.4.0",
     "minimist": "^1.2.0",
-    "n3": "^1.6.3",
+    "n3": "^2.0.0",
     "rdf-parse": "^4.0.0",
     "rdf-store-stream": "^3.0.0",
-    "rdf-test-suite": "^2.1.2",
+    "rdf-test-suite": "^2.1.4",
     "tcp-port-used": "^1.0.1",
     "winston": "^3.2.1"
   },

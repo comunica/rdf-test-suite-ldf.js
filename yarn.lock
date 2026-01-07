@@ -3190,21 +3190,13 @@ n3@^1.16.3, n3@^1.17.0:
     queue-microtask "^1.1.2"
     readable-stream "^4.0.0"
 
-n3@^1.26.0:
-  version "1.26.0"
-  resolved "https://registry.yarnpkg.com/n3/-/n3-1.26.0.tgz#3d69de04bee680b9ebec9dbc1033dc1e6934d351"
-  integrity sha512-SQknS0ua90rN+3RHuk8BeIqeYyqIH/+ecViZxX08jR4j6MugqWRjtONl3uANG/crWXnOM2WIqBJtjIhVYFha+w==
+n3@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/n3/-/n3-2.0.0.tgz#990ff360886a101608145b83efeebe29eed11a80"
+  integrity sha512-U16wgzeUvnP92QSw9q3CWpYcIMB7egm1krI79+a89HoIFf/5Qwvh1RGAV51+W9Dlwr9+1hb60JZlfPfUyzdHtw==
   dependencies:
     buffer "^6.0.3"
     readable-stream "^4.0.0"
-
-n3@^1.6.3:
-  version "1.13.0"
-  resolved "https://registry.yarnpkg.com/n3/-/n3-1.13.0.tgz#aaa37ef40c8adf83f543ae468b8bbd813e422d97"
-  integrity sha512-GMB4ypBfnuf6mmwbtyN6Whc8TfuVDedxc4n+3wsacQH/h0+RjaEobGMhlWrFLDsqVbT94XA6+q9yysMO5SadKA==
-  dependencies:
-    queue-microtask "^1.1.2"
-    readable-stream "^3.6.0"
 
 natural-compare@^1.4.0:
   version "1.4.0"
@@ -3661,10 +3653,10 @@ rdf-terms@^2.0.0:
     rdf-data-factory "^2.0.0"
     rdf-string "^2.0.0"
 
-rdf-test-suite@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/rdf-test-suite/-/rdf-test-suite-2.1.2.tgz#fb8a8c958f11e3920bb6f7a67aef63f1e9a62a4f"
-  integrity sha512-6mwjtpqKeWbd+Vevx/YJBwAe+Csc07EWYBb2xIHohN1KaQugIjjXelErkxUGxPLaUF5UK+dQG8WekltMk2SFTA==
+rdf-test-suite@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/rdf-test-suite/-/rdf-test-suite-2.1.4.tgz#85a393867153e5975c1b804449e7bd970117804e"
+  integrity sha512-3zFZ5UbkS3AiZrfr+RJSm9y0koohmjKi3dSh6Uvyz6X7thHDRmhS00+q1EUgkQ5MNKNC9C6NlaE4+mWQsYSA8g==
   dependencies:
     "@types/json-stable-stringify" "^1.0.32"
     "@types/minimist" "^1.2.0"
@@ -3677,7 +3669,7 @@ rdf-test-suite@^2.1.2:
     jsonld-streaming-parser "^4.0.1"
     log-symbols "^4.0.0"
     minimist "^1.2.0"
-    n3 "^1.26.0"
+    n3 "^2.0.0"
     rdf-data-factory "^2.0.0"
     rdf-isomorphic "^2.0.0"
     rdf-literal "^2.0.0"
