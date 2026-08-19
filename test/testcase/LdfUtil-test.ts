@@ -1,5 +1,5 @@
 import * as fse from "fs-extra";
-import * as nock from 'nock';
+import nock from 'nock';
 import * as Path from 'path';
 import {LdfUtil} from "../../lib/LdfUtil";
 

@@ -1,4 +1,4 @@
-import * as nock from 'nock';
+import nock from 'nock';
 import {ITestCaseData} from "rdf-test-suite";
 import {LdfResponseMockerFactory} from "../../../../lib/factory/LdfResponseMockerFactory";
 import {IMockedResponse, LdfMockFetcher} from "../../../../lib/testcase/ldf/fetchers/LdfMockFetcher";
