@@ -94,7 +94,7 @@
     "global": "^4.4.0",
     "minimist": "^1.2.0",
     "n3": "^2.0.0",
-    "rdf-parse": "^4.0.0",
+    "rdf-parse": "^5.0.0",
     "rdf-store-stream": "^3.0.0",
     "rdf-test-suite": "^2.1.4",
     "tcp-port-used": "^1.0.1",
