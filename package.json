@@ -86,7 +86,7 @@
     "ts-jest": "^29.4.0",
     "tslint": "^6.0.0",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^6.0.0"
+    "typescript": "^7.0.0"
   },
   "dependencies": {
     "@types/fs-extra": "^11.0.0",
