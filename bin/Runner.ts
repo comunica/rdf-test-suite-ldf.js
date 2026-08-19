@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import {existsSync, mkdirSync, writeFileSync} from "fs";
-import * as minimist from 'minimist';
+import minimist from 'minimist';
 import {StreamWriter} from "n3";
 import * as Path from "path";
 import {ITestResult, Util} from "rdf-test-suite";

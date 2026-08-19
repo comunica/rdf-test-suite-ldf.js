@@ -2,8 +2,9 @@
   "compileOnSave": true,
   "compilerOptions": {
     "module": "commonjs",
+    "strict": false,
     "lib": [
-      "es6",
+      "es2022",
       "dom"
     ],
     "target": "es6",
@@ -13,11 +14,7 @@
     "sourceMap": true,
     "inlineSources": true,
     "declaration": true,
-    "importHelpers": false,
-    "skipLibCheck": true,
-    "types": [
-      "node"
-    ]
+    "importHelpers": false
   },
   "include": [
     "index.ts",

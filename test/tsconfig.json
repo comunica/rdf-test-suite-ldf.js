@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "strict": false,
     "lib": [
-      "es6",
+      "es2022",
       "dom"
     ],
     "noImplicitAny": false,
-    "skipLibCheck": true
+    "types": [
+      "jest",
+      "node"
+    ]
   }
 }

@@ -12,7 +12,7 @@ import {
   TestCaseQueryEvaluationHandler,
   Util,
 } from "rdf-test-suite";
-import * as stringifyStream from 'stream-to-string';
+import stringifyStream from 'stream-to-string';
 import {LdfResponseMockerFactory} from "../../factory/LdfResponseMockerFactory";
 import {logger} from "../../factory/Logger";
 import {LdfUtil} from "../../LdfUtil";
