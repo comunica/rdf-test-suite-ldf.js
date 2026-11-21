@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.1.0"></a>
+## [v2.1.0](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v2.0.1...v2.1.0) - 2026-11-21
+
+### Changed
+* [Update dependency rdf-parse to v5](https://github.com/comunica/rdf-test-suite-ldf.js/commit/0481a73707b5ab5a13c02926d3742ccc1466ac84)
+* [Update dependency fs-extra to v11](https://github.com/comunica/rdf-test-suite-ldf.js/commit/e28e3cc359e98eaf8711dc7556325cbde9686895)
+
 <a name="v2.0.1"></a>
 ## [v2.0.1](https://github.com/comunica/rdf-test-suite-ldf.js/compare/v2.0.0...v2.0.1) - 2026-01-07
 
